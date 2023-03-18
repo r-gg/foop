@@ -1,16 +1,16 @@
-package foop.assignment1;
+package foop.a1.client;
 
-import foop.assignment1.main.Game;
+import foop.a1.client.main.Game;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
-public class Assignment1Application {
+public class ClientApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Assignment1Application.class, args);
+		SpringApplication.run(ClientApplication.class, args);
 	}
 
 	@EventListener(ApplicationReadyEvent.class)

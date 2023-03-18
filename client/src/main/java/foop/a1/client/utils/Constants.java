@@ -1,4 +1,4 @@
-package foop.assignment1.utils;
+package foop.a1.client.utils;
 
 public class Constants {
     public static class Directions {

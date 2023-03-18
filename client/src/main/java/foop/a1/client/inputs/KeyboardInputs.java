@@ -1,6 +1,6 @@
-package foop.assignment1.inputs;
+package foop.a1.client.inputs;
 
-import foop.assignment1.main.GamePanel;
+import foop.a1.client.main.GamePanel;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

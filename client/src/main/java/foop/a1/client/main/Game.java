@@ -1,6 +1,6 @@
-package foop.assignment1.main;
+package foop.a1.client.main;
 
-import foop.assignment1.entities.Player;
+import foop.a1.client.entities.Player;
 
 import java.awt.Graphics;
 

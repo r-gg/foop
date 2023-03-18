@@ -1,37 +1,48 @@
 package foop.a1.server.controller;
 
-import foop.a1.server.models.MessageModel;
+import foop.assignment1.messages.RegisterForGame;
+import foop.assignment1.messages.RegistrationSuccessful;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.lang.invoke.MethodHandles;
-import foop.assignment1.messages.RedrawRequest;
-
 @Controller
 public class WebSocketController {
+    private final Logger logger;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    private Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final SimpMessagingTemplate template;
-
-
-    public WebSocketController(SimpMessagingTemplate template) {
-        this.template = template;
+    @Autowired
+    public WebSocketController(Logger logger, SimpMessagingTemplate messagingTemplate) {
+        this.logger = logger;
+        this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/update")
-    @SendTo("/topic")
-    public void updateLocation(MessageModel message){
-        LOGGER.info("Got something in Controller: {}", message);
-        template.convertAndSend("/topic", message);
+    @MessageMapping("/register")
+    public void registerForGame(RegisterForGame registerForGame) {
+        logger.info("Player {} registered", registerForGame.getPlayer().getPlayerId().getId());
+
+        var registration = new RegistrationSuccessful();
+        registration.setPlayer(registerForGame.getPlayer());
+
+        messagingTemplate.convertAndSend("/topic/register", registration);
     }
 
-    public void redrawGameBoard(RedrawRequest redrawRequest){
-
+    public void positionUpdate() {
+        //TODO send PositionUpdate to client /update and subscribe to /topic/update receiving CurrentPosition
     }
 
+    public void redrawGameBoard() {
+        //TODO send RedrawGameBoard to client /redraw
+    }
+
+    public void gameWon() {
+        //TODO send GameWon to client /state
+    }
+
+    public void gameLost() {
+        //TODO send GameLost to client /state
+    }
 
 }

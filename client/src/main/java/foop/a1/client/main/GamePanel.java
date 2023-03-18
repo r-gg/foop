@@ -1,7 +1,7 @@
-package foop.assignment1.main;
+package foop.a1.client.main;
 
-import foop.assignment1.inputs.KeyboardInputs;
-import foop.assignment1.inputs.MouseInputs;
+import foop.a1.client.inputs.KeyboardInputs;
+import foop.a1.client.inputs.MouseInputs;
 
 import java.awt.Color;
 import java.awt.Dimension;

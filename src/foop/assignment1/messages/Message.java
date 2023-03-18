@@ -1,4 +1,4 @@
 package foop.assignment1.messages;
 
-public class RedrawRequest {
+public interface Message {
 }

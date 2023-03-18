@@ -1,16 +1,12 @@
-package foop.a1.server.config;
+package foop.a1.client.config;
 
-import org.apache.juli.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-
-import java.lang.invoke.MethodHandles;
 
 @Configuration
 @EnableWebSocketMessageBroker

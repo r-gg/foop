@@ -1,110 +1,84 @@
 package foop.a1.server.websocket;
 
-import foop.a1.server.models.MessageModel;
-import org.junit.jupiter.api.BeforeAll;
+import foop.assignment1.entities.Player;
+import foop.assignment1.entities.PlayerId;
+import foop.assignment1.messages.RegisterForGame;
+import foop.assignment1.messages.RegistrationSuccessful;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.time.Duration;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class WebSocketTests {
-    private Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    @Autowired
+    private Logger logger;
     @LocalServerPort
     private int port = 8081;
-
     private String URL = "";
+    private Player player;
 
     @BeforeEach
-    public void setUp(){
-        URL = "ws://localhost:"+port+"/game";
+    public void setUp() {
+        URL = "ws://localhost:" + port + "/game";
 
+        var playerId = new PlayerId();
+        playerId.setId(1L);
+
+        player = new Player();
+        player.setPlayerId(playerId);
     }
 
     @Test
-    public void testConnection() throws InterruptedException, ExecutionException, TimeoutException {
-        WebSocketClient client = new StandardWebSocketClient();
-        WebSocketStompClient stompClient = new WebSocketStompClient(client);
-
+    public void testRegisterForGame() throws InterruptedException, ExecutionException, TimeoutException {
+        var client = new StandardWebSocketClient();
+        var stompClient = new WebSocketStompClient(client);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        StompSessionHandler sessionHandler = new MyStompSessionHandler();
-
-        Future<StompSession> fSession = stompClient.connectAsync(URL, sessionHandler);
-        StompSession session = fSession.get(2, TimeUnit.SECONDS);
-
-        final boolean[] received = {false};
-        session.subscribe("/topic", new StompFrameHandler() {
+        final boolean[] success = {false};
+        var futureSession = stompClient.connectAsync(URL, new StompSessionHandlerAdapter() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return String.class;
+                return RegistrationSuccessful.class;
+            }
+
+            @Override
+            public void afterConnected(StompSession session, StompHeaders headers) {
+                session.subscribe("/topic/register", this);
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                LOGGER.info("Got headers {} \n and payload {}", headers, payload);
-                received[0] = true;
+                logger.info("Client received: payload {}, headers {}", payload, headers);
+                success[0] = true;
             }
         });
 
-        Thread.sleep(Duration.ofSeconds(2));
+        var registerForGame = new RegisterForGame();
+        registerForGame.setPlayer(player);
 
-        session.send("/app/update", new MessageModel("to", "from"));
+        var session = futureSession.get(1, TimeUnit.SECONDS);
+        session.send("/app/register", registerForGame);
 
-        Thread.sleep(Duration.ofSeconds(2));
+        Thread.sleep(Duration.ofSeconds(1));
         session.disconnect();
-        assertTrue(received[0]);
-    }
-
-    private class MyStompSessionHandler implements StompSessionHandler {
-        @Override
-        public void afterConnected(
-                StompSession session, StompHeaders connectedHeaders) {
-            LOGGER.info("Connected");
-
-        }
-
-        @Override
-        public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
-        }
-
-        @Override
-        public void handleTransportError(StompSession session, Throwable exception) {
-
-        }
-
-        @Override
-        public Type getPayloadType(StompHeaders headers) {
-            return String.class;
-        }
-
-        @Override
-        public void handleFrame(StompHeaders headers, Object payload) {
-            LOGGER.info("Got headers {} \n and payload {}", headers, payload);
-
-        }
+        assertTrue(success[0]);
     }
 }

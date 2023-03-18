@@ -1,4 +1,4 @@
-package foop.assignment1.main;
+package foop.a1.client.main;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;

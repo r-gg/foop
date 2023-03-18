@@ -1,4 +1,4 @@
-package foop.assignment1.entities;
+package foop.a1.client.entities;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -7,7 +7,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import static foop.assignment1.utils.Constants.PlayerConstants.*;
+import static foop.a1.client.utils.Constants.PlayerConstants.*;
 
 public class Player extends Entity {
     private BufferedImage[][] animations;

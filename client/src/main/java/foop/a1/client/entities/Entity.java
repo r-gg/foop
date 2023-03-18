@@ -1,4 +1,4 @@
-package foop.assignment1.entities;
+package foop.a1.client.entities;
 
 public abstract class Entity {
 

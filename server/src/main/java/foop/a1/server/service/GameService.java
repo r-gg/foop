@@ -1,12 +1,15 @@
 package foop.a1.server.service;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.lang.invoke.MethodHandles;
-
+@Service
 public class GameService {
+    private final Logger logger;
 
-    private Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
+    @Autowired
+    public GameService(Logger logger) {
+        this.logger = logger;
+    }
 }
