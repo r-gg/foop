@@ -22,6 +22,8 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 	testImplementation 'org.springframework.boot:spring-boot-starter-websocket'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    implementation files('lib/remote.jar')
 }
 
 tasks.named('test') {

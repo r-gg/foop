@@ -1,6 +1,6 @@
 package foop.assignment1.entities;
 
-public class Player implements Locatable{
+public class Cat implements Locatable{
     private Position position;
 
     @Override
