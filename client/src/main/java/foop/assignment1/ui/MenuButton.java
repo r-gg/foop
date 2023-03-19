@@ -2,17 +2,20 @@ package foop.assignment1.ui;
 
 import foop.assignment1.gamestates.GameState;
 
+import javax.imageio.ImageIO;
+
 import static foop.assignment1.utils.Constants.UI.Buttons.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class MenuButton {
 
     private int xPos, yPos, rowIndex;
     private int xOffsetCenter = B_WIDTH / 2;
     private GameState state;
-    private BufferedImage img;
+    private BufferedImage[] imgs;
     private boolean mouseOver, mousePressed;
     private Rectangle bounds;
 
@@ -26,18 +29,21 @@ public class MenuButton {
     }
 
     private void initBounds() {
-        bounds = new Rectangle(xPos - xOffsetCenter, yPos, B_WIDTH, B_HEIGHT);
+        bounds = new Rectangle(xPos, yPos, 200, 50);
     }
 
     private void loadImg() {
-        /*imgs = new BufferedImage[3];
-        BufferedImage temp = LoadSave.GetSpriteAtlas(LoadSave.MENU_BUTTONS);
-        for (int i = 0; i < imgs.length; i++)
-            imgs[i] = temp.getSubimage(i * B_WIDTH_DEFAULT, rowIndex * B_HEIGHT_DEFAULT, B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT);*/
+        imgs = new BufferedImage[2];
+        try{
+            imgs[0] = ImageIO.read(getClass().getResourceAsStream("/static/play.png"));
+            imgs[1] = ImageIO.read(getClass().getResourceAsStream("/static/quit.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void draw(Graphics g) {
-        g.drawImage(img, xPos - xOffsetCenter, yPos, B_WIDTH, B_HEIGHT, null);
+        g.drawImage(imgs[rowIndex], xPos, yPos, imgs[rowIndex].getWidth(), imgs[rowIndex].getHeight(), null);
     }
 
 

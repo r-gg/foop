@@ -22,8 +22,8 @@ public class Game implements Runnable {
     public final static int TILES_IN_WIDTH = 26;
     public final static int TILES_IN_HEIGHT = 14;
     public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
-    public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
-    public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
+    public final static int GAME_WIDTH = 832;
+    public final static int GAME_HEIGHT = 448;
     private Player player;
 
     private Menu menu;
@@ -36,7 +36,7 @@ public class Game implements Runnable {
 
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
-        gamePanel.requestFocus();
+        gamePanel.requestFocusInWindow();
 
         startGameLoop();
     }
@@ -116,11 +116,15 @@ public class Game implements Runnable {
     }
 
     public void windowFocusLost() {
-        player.resetDirBooleans();
+        //player.resetDirBooleans();
     }
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Menu getMenu() {
+        return menu;
     }
 
 }

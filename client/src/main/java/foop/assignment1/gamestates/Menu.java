@@ -18,8 +18,8 @@ public class Menu extends State implements StateMethods{
     private int menuX, menuY, menuWidth, menuHeight;
 
     private void loadButtons() {
-        //buttons[0] = new MenuButton(Game.GAME_WIDTH / 2, (int) (130 * Game.SCALE), 0, GameState.WAITINGFOREVERYONE);
-        //buttons[1] = new MenuButton(Game.GAME_WIDTH / 2, (int) (340 * Game.SCALE), 1, GameState.QUIT);
+        buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 50, 0, GameState.WAITINGFOREVERYONE);
+        buttons[1] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 150, 1, GameState.QUIT);
     }
 
     private void loadBackground() {
@@ -52,11 +52,17 @@ public class Menu extends State implements StateMethods{
     @Override
     public void update() {
 
+
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        for (MenuButton mb : buttons) {
+            if (isIn(e, mb)) {
+                mb.applyGamestate();
+                break;
+            }
+        }
     }
 
     @Override
@@ -88,7 +94,7 @@ public class Menu extends State implements StateMethods{
     public void draw(Graphics g) {
         g.drawImage(backgroundImg, 0, 0, backgroundImg.getWidth(), backgroundImg.getHeight(), null);
 
-        /*for (MenuButton mb : buttons)
-            mb.draw(g);*/
+        for (MenuButton mb : buttons)
+            mb.draw(g);
     }
 }
