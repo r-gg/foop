@@ -1,6 +1,6 @@
-package foop.assignment1.entities;
+package foop.a1.server.entities;
 
-public class Cat implements Locatable{
+public class Mouse implements Locatable {
     private Position position;
 
     @Override
@@ -11,5 +11,10 @@ public class Cat implements Locatable{
     @Override
     public Position getPosition() {
         return this.position;
+    }
+
+    @Override
+    public boolean isAboveGround() {
+        return false;
     }
 }

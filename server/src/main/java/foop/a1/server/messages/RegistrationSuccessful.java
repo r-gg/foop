@@ -1,8 +1,8 @@
-package foop.assignment1.messages;
+package foop.a1.server.messages;
 
-import foop.assignment1.entities.Player;
+import foop.a1.server.entities.Player;
 
-public class RegistrationSuccessful implements Message{
+public class RegistrationSuccessful implements Message {
     private Player player;
 
     private String gameId;

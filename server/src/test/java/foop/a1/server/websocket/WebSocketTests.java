@@ -1,9 +1,7 @@
 package foop.a1.server.websocket;
-
-import foop.assignment1.entities.Player;
-import foop.assignment1.entities.PlayerId;
-import foop.assignment1.messages.RegisterForGame;
-import foop.assignment1.messages.RegistrationSuccessful;
+import foop.a1.server.entities.Player;
+import foop.a1.server.messages.RegisterForGame;
+import foop.a1.server.messages.RegistrationSuccessful;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,6 +16,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -39,11 +38,9 @@ public class WebSocketTests {
     public void setUp() {
         URL = "ws://localhost:" + port + "/game";
 
-        var playerId = new PlayerId();
-        playerId.setId(1L);
 
         player = new Player();
-        player.setPlayerId(playerId);
+        player.setPlayerId(UUID.randomUUID().toString());
     }
 
     @Test
