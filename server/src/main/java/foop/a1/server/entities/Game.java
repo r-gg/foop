@@ -1,6 +1,7 @@
 package foop.a1.server.entities;
 
 import foop.a1.server.util.Constants;
+import foop.a1.server.util.GameStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,73 +13,38 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Game implements Runnable {
-
-    private Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    String id;
-
-    GameBoard board;
-
-    List<Player> players;
-
-    List<Mouse> mice;
-
-    boolean isActive = false;
+    private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final String gameId;
+    private final List<Player> players = new ArrayList<>();
+    private final List<Mouse> mice = new ArrayList<>();
+    private GameBoard board;
+    private GameStatus status;
 
     public Game() {
-        id = UUID.randomUUID().toString();
-    }
-
-    public List<Mouse> getMice() {
-        return mice;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public GameBoard getBoard() {
-        return board;
-    }
-
-    public void setBoard(GameBoard board) {
-        this.board = board;
-    }
-
-    public List<Player> getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(List<Player> players) {
-        this.players = players;
+        gameId = UUID.randomUUID().toString();
+        status = GameStatus.WAITING;
     }
 
     public void addPlayer(Player player) {
-        if (player == null) {
-            logger.debug("Player was null when adding");
+        if(!status.equals(GameStatus.WAITING)){
+            logger.info("Game is already running");
             return;
         }
-        if (players == null) {
-            players = new ArrayList<>();
-        }
+
         players.add(player);
         logger.info("Added player: {}", player.getPlayerId());
     }
 
+    public void removePlayer(Player player){
+        players.remove(player);
+    }
+
     public void start() {
-        isActive = true;
+        this.status = GameStatus.STARTED;
+
         Thread t = new Thread(this);
         t.start();
     }
-
-    public List<Position> getCatLocations() {
-        return players.stream().map(Player::getPosition).collect(Collectors.toList());
-    }
-
 
     @Override
     public void run() {
@@ -104,7 +70,36 @@ public class Game implements Runnable {
                 break;
             }
         }
-        logger.info("Finished game {}", this.id);
 
+        this.status = GameStatus.ENDED;
+        logger.info("Finished game {}", this.gameId);
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public List<Mouse> getMice() {
+        return mice;
+    }
+
+    public GameBoard getBoard() {
+        return board;
+    }
+
+    public void setBoard(GameBoard board) {
+        this.board = board;
+    }
+
+    public GameStatus getStatus(){
+        return this.status;
+    }
+
+    public List<Position> getCatLocations() {
+        return players.stream().map(Player::getPosition).collect(Collectors.toList());
     }
 }

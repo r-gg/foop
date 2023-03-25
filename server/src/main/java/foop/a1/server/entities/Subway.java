@@ -1,21 +1,17 @@
 package foop.a1.server.entities;
 
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Subway {
-
-    private Position[] entrances;
-
-    private int delay; // number of game loop iterations a mouse needs to go from one entrance to any other
-
-    // TODO: Transform into Mouse
-    private List<ServerMouse> mice;
+    private final Position[] entrances;
+    private final List<Mouse> mice;
+    private int delay;
 
     public Subway(List<Position> entrances) {
         Position[] arr = new Position[entrances.size()];
+
         this.entrances = entrances.toArray(arr);
         this.mice = new ArrayList<>();
     }
@@ -24,17 +20,16 @@ public class Subway {
         return entrances;
     }
 
-    public List<ServerMouse> getMice() {
+    public List<Mouse> getMice() {
         return mice;
     }
 
-    public void addMouse(ServerMouse mouse){
-        if(mouse != null) mice.add(mouse);
+    public void addMouse(Mouse mouse) {
+        mice.add(mouse);
     }
 
-    // TODO: Check if runs on server, then cast?
-    public void informMice(Game game){
-        for (ServerMouse mouse: mice) {
+    public void informMice(Game game) {
+        for (Mouse mouse : mice) {
             mouse.inform(game);
         }
     }

@@ -8,33 +8,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 @Service
 public class GameService {
-    private final Logger logger;
+    private final List<Game> games = new ArrayList<>();
 
-    private final SimpMessagingTemplate messagingTemplate;
-
-    // Currently only one game-session supported.
-    private Game game; // todo: if support for concurrent games is needed, turn into a hashmap
-
-    @Autowired
-    public GameService(Logger logger, SimpMessagingTemplate messagingTemplate) {
-        this.logger = logger;
-        this.messagingTemplate = messagingTemplate;
-        game = new Game();
+    public String createGame() {
+        var game = new Game() {{
+            setBoard(new GameBoard(200, 200));
+        }};
+        games.add(game);
+        return game.getGameId();
     }
 
-    public void registerPlayer(Player player){
-        game.addPlayer(player);
+    public List<Game> getAllGames() {
+        return games;
     }
 
-    public void createGame(){
-        game.setBoard(new GameBoard(200,200));
-
+    public Optional<Game> getGame(String gameId) {
+        return games.stream().filter(game -> Objects.equals(game.getGameId(), gameId)).findFirst();
     }
 
-    public void startGame(){
+    public void startGame(Game game) {
         game.start();
     }
 
+    public String registerPlayer(Game game) {
+        var player = new Player();
+        game.addPlayer(player);
+
+        return player.getPlayerId();
+    }
+
+    public void deregisterPlayer(Game game, Player player) {
+        game.removePlayer(player);
+    }
+
+    public Optional<Player> getPlayer(Game game, String playerId) {
+        return game.getPlayers().stream().filter(player -> Objects.equals(player.getPlayerId(), playerId)).findFirst();
+    }
 }

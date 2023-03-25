@@ -2,6 +2,8 @@ package foop.a1.client.controller;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -15,6 +17,4 @@ public class WebSocketController {
         this.logger = logger;
         this.messagingTemplate = messagingTemplate;
     }
-
-    //TODO pull/push methods of client similar to server
 }
