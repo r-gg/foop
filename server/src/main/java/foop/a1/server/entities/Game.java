@@ -33,6 +33,8 @@ public class Game implements Runnable {
 
         players.add(player);
         logger.info("Added player: {}", player.getPlayerId());
+
+        //TODO if players size >= 4, status to ALL_READY and start
     }
 
     public void removePlayer(Player player){
