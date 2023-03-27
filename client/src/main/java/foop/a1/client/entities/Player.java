@@ -17,7 +17,12 @@ public class Player extends Entity {
     private boolean left, up, right, down;
     private float playerSpeed = 2.0f;
 
-    public Player(float x, float y) {
+    public Player(){
+        super(0, 0);
+        loadAnimations();
+    }
+
+    public Player(int x, int y) {
         super(x, y);
         loadAnimations();
     }

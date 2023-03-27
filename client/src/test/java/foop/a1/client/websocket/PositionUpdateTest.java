@@ -1,7 +1,7 @@
-package foop.a1.server.websocket;
+package foop.a1.client.websocket;
 
-import foop.a1.server.messages.request.CreateGame;
-import foop.a1.server.messages.response.SingleGame;
+import foop.a1.client.messages.request.PositionUpdate;
+import foop.a1.client.messages.response.CurrentPosition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class CreateGameTest {
+public class PositionUpdateTest {
     @LocalServerPort
     private int port;
     private String URL;
@@ -34,36 +34,33 @@ public class CreateGameTest {
     }
 
     @Test
-    public void testCreateGame() throws ExecutionException, InterruptedException, TimeoutException {
+    public void testPositionUpdate() throws ExecutionException, InterruptedException, TimeoutException {
         var client = new StandardWebSocketClient();
         var stompClient = new WebSocketStompClient(client);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        final String[] gameId = new String[1];
+        final CurrentPosition[] position = new CurrentPosition[1];
         var futureSession = stompClient.connectAsync(URL, new StompSessionHandlerAdapter() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return SingleGame.class;
+                return CurrentPosition.class;
             }
 
             @Override
             public void afterConnected(StompSession session, StompHeaders headers) {
-                session.subscribe("/topic/games/create", this);
+                session.subscribe("/topic/{gameId}/update", this);
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                var game = (SingleGame) payload;
-                gameId[0] = game.getGame().getGameId();
+                position[0] = (CurrentPosition) payload;
             }
         });
 
-        var createGame = new CreateGame();
-
         var session = futureSession.get(1, TimeUnit.SECONDS);
-        session.send("/app/games/create", createGame);
+        session.send("/app/{gameId}/update", new PositionUpdate());
 
-        Thread.sleep(100);
-        assertNotNull(gameId[0]);
+        Thread.sleep(200);
+        assertNotNull(position[0].getPlayer());
     }
 }

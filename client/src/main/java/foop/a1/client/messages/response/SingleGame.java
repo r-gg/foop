@@ -1,7 +1,7 @@
-package foop.a1.server.messages.response;
+package foop.a1.client.messages.response;
 
-import foop.a1.server.dto.GameDTO;
-import foop.a1.server.messages.Message;
+import foop.a1.client.dto.GameDTO;
+import foop.a1.client.messages.Message;
 
 public class SingleGame implements Message {
     private GameDTO game;

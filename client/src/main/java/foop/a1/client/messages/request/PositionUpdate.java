@@ -1,8 +1,9 @@
-package foop.a1.server.messages.request;
+package foop.a1.client.messages.request;
 
-import foop.a1.server.messages.Message;
 
-public class CreateGame implements Message {
+import foop.a1.client.messages.Message;
+
+public class PositionUpdate implements Message {
     private String msg;
 
     public String getMsg() {
