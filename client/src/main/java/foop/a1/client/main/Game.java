@@ -1,6 +1,10 @@
 package foop.a1.client.main;
 
-import foop.a1.client.entities.Player;
+import foop.assignment1.entities.Player;
+import foop.assignment1.gamestates.GameState;
+import foop.assignment1.gamestates.Playing;
+import foop.assignment1.gamestates.WaitingForEveryone;
+import foop.assignment1.gamestates.Menu;
 
 import java.awt.Graphics;
 
@@ -12,21 +16,35 @@ public class Game implements Runnable {
     private Thread gameThread;
     private final int FPS_SET = 120;
     private final int UPS_SET = 200;
+    public final static float SCALE = 2f;
 
+    public final static int TILES_DEFAULT_SIZE = 32;
+    public final static int TILES_IN_WIDTH = 26;
+    public final static int TILES_IN_HEIGHT = 14;
+    public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
+    public final static int GAME_WIDTH = 832;
+    public final static int GAME_HEIGHT = 448;
     private Player player;
+
+    private Menu menu;
+
+    private WaitingForEveryone waiting;
+    private Playing playing;
 
     public Game() {
         initClasses();
 
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
-        gamePanel.requestFocus();
+        gamePanel.requestFocusInWindow();
 
         startGameLoop();
     }
 
     private void initClasses() {
-        player = new Player(200, 200);
+        menu = new Menu(this);
+        //playing = new Playing(this);
+        //waiting = new WaitingForEveryone(this);
 
     }
 
@@ -36,11 +54,20 @@ public class Game implements Runnable {
     }
 
     public void update() {
-        player.update();
+        switch (GameState.state) {
+            case MENU -> menu.update();
+            //case PLAYING -> playing.update();
+            //case WAITINGFOREVERYONE -> waiting.update();
+            case QUIT -> System.exit(0);
+        }
     }
 
     public void render(Graphics g) {
-        player.render(g);
+        switch (GameState.state) {
+            case MENU -> menu.draw(g);
+            //case PLAYING -> playing.draw(g);
+            //the rest
+        }
     }
 
     @Override
@@ -89,11 +116,15 @@ public class Game implements Runnable {
     }
 
     public void windowFocusLost() {
-        player.resetDirBooleans();
+        //player.resetDirBooleans();
     }
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Menu getMenu() {
+        return menu;
     }
 
 }
