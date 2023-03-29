@@ -1,4 +1,4 @@
-package foop.a1.client.entities;
+package foop.a1.client.states.playing.entities;
 
 public abstract class Entity {
     protected String id;
@@ -8,7 +8,6 @@ public abstract class Entity {
     public Entity(int x, int y) {
         this.x = x;
         this.y = y;
-
     }
 
     public String getId() {

@@ -1,32 +1,23 @@
 package foop.a1.client.main;
 
-import foop.assignment1.inputs.KeyboardInputs;
-import foop.assignment1.inputs.MouseInputs;
-import static foop.assignment1.main.Game.*;
+import foop.a1.client.inputs.KeyboardInputs;
+import foop.a1.client.inputs.MouseInputs;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-
-
-
 public class GamePanel extends JPanel {
 
-    private MouseInputs mouseInputs;
-    private Game game;
-
-    public GamePanel(Game game) {
-        mouseInputs = new MouseInputs(this);
-        this.game = game;
+    public GamePanel() {
+        var mouseInputs = new MouseInputs();
 
         setPanelSize();
-        addKeyListener(new KeyboardInputs(this));
+        addKeyListener(new KeyboardInputs());
+
         addMouseListener(mouseInputs);
         addMouseMotionListener(mouseInputs);
-
     }
 
     private void setPanelSize() {
@@ -34,17 +25,8 @@ public class GamePanel extends JPanel {
         setPreferredSize(size);
     }
 
-    public void updateGame() {
-
-    }
-
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        game.render(g);
+        Game.instance().render(g);
     }
-
-    public Game getGame() {
-        return game;
-    }
-
 }

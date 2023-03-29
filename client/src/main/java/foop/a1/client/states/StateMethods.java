@@ -1,4 +1,4 @@
-package foop.assignment1.gamestates;
+package foop.a1.client.states;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

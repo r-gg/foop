@@ -1,78 +1,45 @@
 package foop.a1.client.main;
 
-import foop.assignment1.entities.Player;
-import foop.assignment1.gamestates.GameState;
-import foop.assignment1.gamestates.Playing;
-import foop.assignment1.gamestates.WaitingForEveryone;
-import foop.assignment1.gamestates.Menu;
+import foop.a1.client.states.State;
+import foop.a1.client.states.menu.Menu;
 
 import java.awt.Graphics;
 
 
 public class Game implements Runnable {
-
-    private GameWindow gameWindow;
-    private GamePanel gamePanel;
-    private Thread gameThread;
+    private final GameWindow gameWindow;
+    private final GamePanel gamePanel;
     private final int FPS_SET = 120;
     private final int UPS_SET = 200;
-    public final static float SCALE = 2f;
-
-    public final static int TILES_DEFAULT_SIZE = 32;
-    public final static int TILES_IN_WIDTH = 26;
-    public final static int TILES_IN_HEIGHT = 14;
-    public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
     public final static int GAME_WIDTH = 832;
     public final static int GAME_HEIGHT = 448;
-    private Player player;
+    private static Game instance;
+    private String gameId;
+    private State state;
 
-    private Menu menu;
-
-    private WaitingForEveryone waiting;
-    private Playing playing;
-
-    public Game() {
-        initClasses();
-
-        gamePanel = new GamePanel(this);
+    private Game() {
+        gamePanel = new GamePanel();
         gameWindow = new GameWindow(gamePanel);
         gamePanel.requestFocusInWindow();
+
+        state = new Menu();
 
         startGameLoop();
     }
 
-    private void initClasses() {
-        menu = new Menu(this);
-        //playing = new Playing(this);
-        //waiting = new WaitingForEveryone(this);
+    public static Game instance() {
+        if (instance == null)
+            instance = new Game();
 
-    }
-
-    private void startGameLoop() {
-        gameThread = new Thread(this);
-        gameThread.start();
-    }
-
-    public void update() {
-        switch (GameState.state) {
-            case MENU -> menu.update();
-            //case PLAYING -> playing.update();
-            //case WAITINGFOREVERYONE -> waiting.update();
-            case QUIT -> System.exit(0);
-        }
+        return instance;
     }
 
     public void render(Graphics g) {
-        switch (GameState.state) {
-            case MENU -> menu.draw(g);
-            //case PLAYING -> playing.draw(g);
-            //the rest
-        }
+        state.draw(g);
     }
 
     @Override
     public void run() {
-
         double timePerFrame = 1000000000.0 / FPS_SET;
         double timePerUpdate = 1000000000.0 / UPS_SET;
 
@@ -112,19 +79,30 @@ public class Game implements Runnable {
 
             }
         }
-
     }
 
-    public void windowFocusLost() {
-        //player.resetDirBooleans();
+    private void startGameLoop() {
+        Thread gameThread = new Thread(this);
+        gameThread.start();
     }
 
-    public Player getPlayer() {
-        return player;
+    private void update() {
+        state.update();
     }
 
-    public Menu getMenu() {
-        return menu;
+    public State getState() {
+        return state;
     }
 
+    public void nextState(State state) {
+        this.state = state;
+    }
+
+    public String getGameId() {
+        return gameId != null ? gameId : "";
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
 }

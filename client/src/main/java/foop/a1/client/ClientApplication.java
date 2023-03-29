@@ -16,7 +16,7 @@ public class ClientApplication {
 	@EventListener(ApplicationReadyEvent.class)
 	public void startGame(){
 		System.setProperty("java.awt.headless", "false");
-		new Game();
+		Game.instance();
 	}
 
 }

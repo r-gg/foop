@@ -1,59 +1,12 @@
 package foop.a1.client.inputs;
 
-import foop.a1.client.main.GamePanel;
+import foop.a1.client.main.Game;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 
-public class MouseInputs implements MouseListener, MouseMotionListener {
-
-    private GamePanel gamePanel;
-
-    public MouseInputs(GamePanel gamePanel) {
-        this.gamePanel = gamePanel;
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-
-    }
-
+public class MouseInputs extends MouseAdapter {
     @Override
     public void mouseClicked(MouseEvent e) {
-        switch (GameState.state) {
-            case MENU -> gamePanel.getGame().getMenu().mouseClicked(e);
-        }
-
+        Game.instance().getState().mouseClicked(e);
     }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
 }

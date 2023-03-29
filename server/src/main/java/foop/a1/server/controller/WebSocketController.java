@@ -86,7 +86,7 @@ public class WebSocketController {
         messagingTemplate.convertAndSend("/topic/register", new RegistrationResult(gameDto, playerDto));
     }
 
-    public void positionUpdate() throws ExecutionException, InterruptedException, TimeoutException {
+    public void positionUpdate(Game game) throws ExecutionException, InterruptedException, TimeoutException {
         var client = new StandardWebSocketClient();
         var stompClient = new WebSocketStompClient(client);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
@@ -99,7 +99,7 @@ public class WebSocketController {
 
             @Override
             public void afterConnected(StompSession session, StompHeaders headers) {
-                session.subscribe("/topic/{gameId}/update", this);
+                session.subscribe(String.format("/topic/%s/update", game.getGameId()), this);
             }
 
             @Override
@@ -109,7 +109,7 @@ public class WebSocketController {
         });
 
         var session = futureSession.get(1, TimeUnit.SECONDS);
-        session.send("/{gameId}/update", new PositionUpdate());
+        session.send(String.format("/%s/update", game.getGameId()), new PositionUpdate());
     }
 
     public void gameStatusUpdate(Game game) throws ExecutionException, InterruptedException, TimeoutException {
@@ -135,7 +135,7 @@ public class WebSocketController {
         var statusUpdate = new StatusUpdate(gameDto, gameBoardDto);
 
         var session = futureSession.get(1, TimeUnit.SECONDS);
-        session.send("/{gameId}/status", statusUpdate);
+        session.send(String.format("/%s/status", game.getGameId()), statusUpdate);
     }
 
     private void handlePositionUpdate(String gameId, CurrentPosition currentPosition) {
