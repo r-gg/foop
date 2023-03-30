@@ -9,7 +9,7 @@ build/
 .apt_generated
 .classpath
 .factorypath
-.projectide
+.project
 .settings
 .springBeans
 .sts4-cache
@@ -65,5 +65,7 @@ replay_pid*
 ### Example user template
 
 # IntelliJ project files
+.idea
+*.iml
 out
 gen

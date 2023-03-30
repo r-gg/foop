@@ -19,6 +19,8 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-core'
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation files('lib/remote.jar')
 }
 
 tasks.named('test') {
