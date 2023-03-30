@@ -15,7 +15,7 @@ public class GameWindow {
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jframe.add(gamePanel);
         jframe.setLocationRelativeTo(null);
-        jframe.setResizable(false);
+//        jframe.setResizable(false);
         jframe.pack();
         jframe.setVisible(true);
         jframe.addWindowFocusListener(new WindowFocusListener() {
@@ -32,6 +32,15 @@ public class GameWindow {
             }
         });
 
+    }
+
+    public void setSize(int width, int height) {
+        jframe.setSize(width, height);
+    }
+
+    public void fullscreen() {
+        jframe.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        jframe.setUndecorated(true);
     }
 
 }

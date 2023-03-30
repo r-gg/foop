@@ -42,9 +42,16 @@ public class Game implements Runnable {
     }
 
     private void initClasses() {
+        Player[] players = { // cats
+            new Player(150, 300),
+            new Player(100, 200),
+            new Player(120, 250),
+        };
+        this.player = players[0];
+
         menu = new Menu(this);
-        //playing = new Playing(this);
-        //waiting = new WaitingForEveryone(this);
+        playing = new Playing(this, players);
+        waiting = new WaitingForEveryone(this);
 
     }
 
@@ -56,8 +63,8 @@ public class Game implements Runnable {
     public void update() {
         switch (GameState.state) {
             case MENU -> menu.update();
-            //case PLAYING -> playing.update();
-            //case WAITINGFOREVERYONE -> waiting.update();
+            case PLAYING -> playing.update();
+            case WAITINGFOREVERYONE -> waiting.update();
             case QUIT -> System.exit(0);
         }
     }
@@ -65,8 +72,8 @@ public class Game implements Runnable {
     public void render(Graphics g) {
         switch (GameState.state) {
             case MENU -> menu.draw(g);
-            //case PLAYING -> playing.draw(g);
-            //the rest
+            case PLAYING -> playing.draw(g);
+            case WAITINGFOREVERYONE ->  waiting.draw(g);
         }
     }
 
@@ -127,4 +134,9 @@ public class Game implements Runnable {
         return menu;
     }
 
+    public WaitingForEveryone getWaiting() {
+        return waiting;
+    }
+
+    public Playing getPlaying() { return playing; }
 }

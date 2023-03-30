@@ -70,17 +70,23 @@ public class Player extends Entity {
         moving = false;
 
         if (left && !right) {
-            x -= playerSpeed;
+            if (x > -128) { // -width
+                x -= playerSpeed;
+            }
             moving = true;
         } else if (right && !left) {
+            // limit with windows size
             x += playerSpeed;
             moving = true;
         }
 
         if (up && !down) {
-            y -= playerSpeed;
+            if (y > -80) {
+                y -= playerSpeed;
+            }
             moving = true;
         } else if (down && !up) {
+            // TODO: limit with window size
             y += playerSpeed;
             moving = true;
         }

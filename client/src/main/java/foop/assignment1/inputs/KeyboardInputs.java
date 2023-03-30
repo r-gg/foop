@@ -25,13 +25,25 @@ public class KeyboardInputs implements KeyListener {
             case KeyEvent.VK_W:
                 gamePanel.getGame().getPlayer().setUp(false);
                 break;
+            case KeyEvent.VK_UP:
+                gamePanel.getGame().getPlayer().setUp(false);
+                break;
             case KeyEvent.VK_A:
+                gamePanel.getGame().getPlayer().setLeft(false);
+                break;
+            case KeyEvent.VK_LEFT:
                 gamePanel.getGame().getPlayer().setLeft(false);
                 break;
             case KeyEvent.VK_S:
                 gamePanel.getGame().getPlayer().setDown(false);
                 break;
+            case KeyEvent.VK_DOWN:
+                gamePanel.getGame().getPlayer().setDown(false);
+                break;
             case KeyEvent.VK_D:
+                gamePanel.getGame().getPlayer().setRight(false);
+                break;
+            case KeyEvent.VK_RIGHT:
                 gamePanel.getGame().getPlayer().setRight(false);
                 break;
         }
@@ -43,13 +55,25 @@ public class KeyboardInputs implements KeyListener {
             case KeyEvent.VK_W:
                 gamePanel.getGame().getPlayer().setUp(true);
                 break;
+            case KeyEvent.VK_UP:
+                gamePanel.getGame().getPlayer().setUp(true);
+                break;
             case KeyEvent.VK_A:
+                gamePanel.getGame().getPlayer().setLeft(true);
+                break;
+            case KeyEvent.VK_LEFT:
                 gamePanel.getGame().getPlayer().setLeft(true);
                 break;
             case KeyEvent.VK_S:
                 gamePanel.getGame().getPlayer().setDown(true);
                 break;
+            case KeyEvent.VK_DOWN:
+                gamePanel.getGame().getPlayer().setDown(true);
+                break;
             case KeyEvent.VK_D:
+                gamePanel.getGame().getPlayer().setRight(true);
+                break;
+            case KeyEvent.VK_RIGHT:
                 gamePanel.getGame().getPlayer().setRight(true);
                 break;
         }
