@@ -1,9 +1,9 @@
 package foop.a1.client.states.menu;
 
-import foop.a1.client.states.playing.Playing;
 import foop.a1.client.states.quit.Quit;
 import foop.a1.client.states.State;
 import foop.a1.client.main.Game;
+import foop.a1.client.states.waiting.Waiting;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,7 +22,7 @@ public class Menu extends State {
     }
 
     private void loadButtons() {
-        buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 50, 0, new Playing());
+        buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 50, 0, new Waiting());
         buttons[1] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 150, 1, new Quit());
     }
 
