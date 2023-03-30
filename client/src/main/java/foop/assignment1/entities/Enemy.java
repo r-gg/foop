@@ -18,7 +18,7 @@ public class Enemy extends Entity{
     }
 
     public void render(Graphics g) {
-        g.drawImage(img, (int) x, (int) y, 40, 40, null);
+        g.drawImage(img, (int) x, (int) y, 50, 30, null);
     }
 
     private void loadImage() {

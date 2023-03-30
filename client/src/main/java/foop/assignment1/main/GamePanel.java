@@ -26,6 +26,7 @@ public class GamePanel extends JPanel {
         addKeyListener(new KeyboardInputs(this));
         addMouseListener(mouseInputs);
         addMouseMotionListener(mouseInputs);
+        this.setBackground(Color.WHITE);
 
     }
 

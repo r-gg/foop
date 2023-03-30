@@ -20,11 +20,14 @@ public class Playing extends State implements StateMethods {
             new Enemy(50, 300, 0),
             new Enemy(10, 100, 0),
             new Enemy(20, 250, 0),
+            new Enemy(170, 220, 0),
     };
     private SubwayEntrance[] subwayEntrances = {
             new SubwayEntrance(120, 120),
             new SubwayEntrance(20, 40),
             new SubwayEntrance(180, 180),
+            new SubwayEntrance(300, 350),
+            new SubwayEntrance(230, 270),
     };
 
     private void loadBackground() {

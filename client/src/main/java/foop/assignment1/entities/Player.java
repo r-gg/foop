@@ -70,7 +70,7 @@ public class Player extends Entity {
         moving = false;
 
         if (left && !right) {
-            if (x > -128) { // -width
+            if (x > -128) {
                 x -= playerSpeed;
             }
             moving = true;

@@ -12,10 +12,11 @@ import java.io.InputStream;
 
 public class WaitingForEveryone extends State implements StateMethods {
     private BufferedImage backgroundImg;
+    private BufferedImage waitingImg;
     // temporary button to be able to start the game manually(for gui development)
-    private Rectangle startButton = new Rectangle(100, 100, 100, 50);
+    private Rectangle startButton = new Rectangle(10, 10, 100, 50);
 
-    private void loadBackground() {
+    private void loadImages() {
         InputStream is = getClass().getResourceAsStream("/static/background.png");
         try {
             BufferedImage img = ImageIO.read(is);
@@ -30,11 +31,24 @@ public class WaitingForEveryone extends State implements StateMethods {
             }
         }
 
+        InputStream is2 = getClass().getResourceAsStream("/static/waiting.png");
+        try {
+            BufferedImage img = ImageIO.read(is2);
+            waitingImg = img;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public WaitingForEveryone(Game game) {
         super(game);
-        loadBackground();
+        loadImages();
     }
 
     @Override
@@ -78,9 +92,8 @@ public class WaitingForEveryone extends State implements StateMethods {
     @Override
     public void draw(Graphics g) {
         g.drawImage(backgroundImg, 0, 0, backgroundImg.getWidth(), backgroundImg.getHeight(), null);
+        g.drawImage(waitingImg, 0, 0, backgroundImg.getWidth(), backgroundImg.getHeight(), null);
         g.drawRect((int)startButton.getX(), (int)startButton.getY(), (int)startButton.getWidth(), (int)startButton.getHeight());
         g.drawString("Start", (int)startButton.getX() + 20, (int)startButton.getY() + 20);
-
-        g.drawString("Waiting for all players", backgroundImg.getWidth() / 2, backgroundImg.getHeight() / 2);
     }
 }
