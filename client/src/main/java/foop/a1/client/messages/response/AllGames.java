@@ -1,11 +1,12 @@
 package foop.a1.client.messages.response;
 
 import foop.a1.client.dto.GameDTO;
-import foop.a1.client.messages.Message;
+import foop.a1.client.messages.ServerMessage;
 
 import java.util.List;
 
-public class AllGames implements Message {
+// do we need all games?
+public class AllGames implements ServerMessage {
     private List<GameDTO> games;
 
     public AllGames() {
@@ -21,5 +22,10 @@ public class AllGames implements Message {
 
     public void setGames(List<GameDTO> games) {
         this.games = games;
+    }
+
+    @Override
+    public void handleMessage() {
+
     }
 }

@@ -2,9 +2,9 @@ package foop.a1.client.messages.response;
 
 import foop.a1.client.dto.GameDTO;
 import foop.a1.client.dto.PlayerDTO;
-import foop.a1.client.messages.Message;
+import foop.a1.client.messages.ServerMessage;
 
-public class RegistrationResult implements Message {
+public class RegistrationResult implements ServerMessage {
     private GameDTO game;
     private PlayerDTO player;
     private boolean successful;
@@ -40,5 +40,10 @@ public class RegistrationResult implements Message {
 
     public void setSuccessful(boolean successful) {
         this.successful = successful;
+    }
+
+    @Override
+    public void handleMessage() {
+
     }
 }

@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class RegisterForGameTest {
     @LocalServerPort
-    private final int port = 8081;
+    private final int port = 8082;
     private String URL;
 
     @BeforeEach
