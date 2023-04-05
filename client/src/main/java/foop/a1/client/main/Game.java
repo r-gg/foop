@@ -14,6 +14,7 @@ public class Game implements Runnable {
     public final static int GAME_WIDTH = 832;
     public final static int GAME_HEIGHT = 448;
     private static Game instance;
+    private static final Object mutex = new Object();
     private String gameId;
     private State state;
 
@@ -28,10 +29,16 @@ public class Game implements Runnable {
     }
 
     public static Game instance() {
-        if (instance == null)
-            instance = new Game();
+        Game _instance = instance;
+        if (_instance == null) {
+            synchronized (mutex) {
+                _instance = instance;
+                if (_instance == null)
+                    instance = _instance = new Game();
+            }
+        }
 
-        return instance;
+        return _instance;
     }
 
     public void render(Graphics g) {
