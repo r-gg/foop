@@ -1,10 +1,13 @@
-package foop.a1.client.messages.request;
+package foop.a1.client.messages.response;
 
 import foop.a1.client.dto.GameBoardDTO;
 import foop.a1.client.dto.GameDTO;
-import foop.a1.client.messages.Message;
+import foop.a1.client.main.Game;
+import foop.a1.client.messages.ServerMessage;
+import foop.a1.client.states.State;
+import foop.a1.client.states.playing.Playing;
 
-public class StatusUpdate implements Message {
+public class StatusUpdate implements ServerMessage {
     private GameDTO game;
     private GameBoardDTO gameBoard;
 
@@ -30,5 +33,14 @@ public class StatusUpdate implements Message {
 
     public void setGameBoard(GameBoardDTO gameBoard) {
         this.gameBoard = gameBoard;
+    }
+
+    @Override
+    public void handleMessage() {
+        Class<? extends State> stateClass = Game.instance().getState().getClass();
+
+        if (stateClass.equals(Playing.class)) {
+            Game.instance().getState().update();
+        }
     }
 }

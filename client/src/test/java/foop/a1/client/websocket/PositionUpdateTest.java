@@ -2,7 +2,7 @@ package foop.a1.client.websocket;
 
 import foop.a1.client.main.Game;
 import foop.a1.client.messages.request.PositionUpdate;
-import foop.a1.client.messages.response.CurrentPosition;
+import foop.a1.client.messages.request.CurrentPosition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

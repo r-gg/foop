@@ -1,4 +1,4 @@
-package foop.a1.client.messages.response;
+package foop.a1.client.messages.request;
 
 import foop.a1.client.dto.PlayerDTO;
 import foop.a1.client.messages.Message;

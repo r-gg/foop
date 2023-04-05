@@ -20,6 +20,8 @@ public class Waiting extends State {
 
     public Waiting() {
         loadImages();
+        System.out.println("waiting called");
+        //Game.instance().subscribeToGame();
     }
 
     private void loadImages() {

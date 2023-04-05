@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("test")
 public class GetGamesTest {
     @LocalServerPort
-    private final int port = 8081;
+    private final int port = 8082;
     private String URL;
 
     @BeforeEach

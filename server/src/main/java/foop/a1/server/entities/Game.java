@@ -4,6 +4,7 @@ import foop.a1.server.util.Constants;
 import foop.a1.server.util.GameStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;

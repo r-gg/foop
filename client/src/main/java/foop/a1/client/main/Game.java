@@ -1,12 +1,18 @@
 package foop.a1.client.main;
 
+import foop.a1.client.service.WebsocketService;
 import foop.a1.client.states.State;
 import foop.a1.client.states.menu.Menu;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.awt.Graphics;
 
 
 public class Game implements Runnable {
+
+    private static WebsocketService websocketService;
+
     private final GameWindow gameWindow;
     private final GamePanel gamePanel;
     private final int FPS_SET = 120;
@@ -103,6 +109,16 @@ public class Game implements Runnable {
 
     public void nextState(State state) {
         this.state = state;
+        // TODO: Maybe redraw here because it is called from the SingleGame.class
+    }
+
+    public void subscribeToGame(){
+        websocketService.subscribe("/topic/"+instance().gameId+"/register");
+        websocketService.subscribe("/topic/"+instance().gameId+"/update");
+    }
+
+    public static void setWebsocketService(WebsocketService websocketService) {
+        Game.websocketService = websocketService;
     }
 
     public String getGameId() {
