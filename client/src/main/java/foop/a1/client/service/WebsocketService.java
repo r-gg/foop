@@ -49,10 +49,7 @@ public class WebsocketService {
 
 
 
-    public void connect(int port){
-        if(port != -1){ // TODO: remove after moving to Client
-            URL = "ws://localhost:" + port + "/game";
-        }
+    public void connect(){
         CompletableFuture<StompSession> futureSession = stompClient.connectAsync(URL, sessionHandler);
         StompSession session = null;
         try {
@@ -70,10 +67,6 @@ public class WebsocketService {
             throw new RuntimeException(e);
         }
 
-    }
-
-    public void connect(){
-        connect(-1);
     }
 
     public void send(String destination, Object payload){

@@ -2,12 +2,9 @@ package foop.a1.client.messages.response;
 
 import foop.a1.client.dto.GameBoardDTO;
 import foop.a1.client.dto.GameDTO;
-import foop.a1.client.main.Game;
-import foop.a1.client.messages.ServerMessage;
-import foop.a1.client.states.State;
-import foop.a1.client.states.playing.Playing;
+import foop.a1.client.messages.Message;
 
-public class StatusUpdate implements ServerMessage {
+public class StatusUpdate implements Message {
     private GameDTO game;
     private GameBoardDTO gameBoard;
 
@@ -35,12 +32,5 @@ public class StatusUpdate implements ServerMessage {
         this.gameBoard = gameBoard;
     }
 
-    @Override
-    public void handleMessage() {
-        Class<? extends State> stateClass = Game.instance().getState().getClass();
 
-        if (stateClass.equals(Playing.class)) {
-            Game.instance().getState().update();
-        }
-    }
 }

@@ -3,13 +3,13 @@ package foop.a1.client.messages.request;
 import foop.a1.client.messages.Message;
 
 public class RegisterForGame implements Message {
-    private String msg;
+    private String username;
 
-    public String getMsg() {
-        return msg;
+    public String getUsername() {
+        return username;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

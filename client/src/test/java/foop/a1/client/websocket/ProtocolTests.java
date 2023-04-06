@@ -2,6 +2,7 @@ package foop.a1.client.websocket;
 
 import foop.a1.client.main.Game;
 import foop.a1.client.messages.request.CreateGame;
+import foop.a1.client.messages.request.RegisterForGame;
 import foop.a1.client.service.WebsocketService;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,6 +40,22 @@ public class ProtocolTests {
         Thread.sleep(1000);
         assertFalse(Game.instance().getGameId().isEmpty());
         assertEquals(Game.instance().getState().getClass(), Waiting.class);
+    }
+
+
+    @Test
+    public void registerForGame_registersPlayer() throws InterruptedException {
+        // Create a game
+        StompSession.Subscription subscription = websocketService.subscribe("/topic/games/create");
+        websocketService.send("/app/games/create", new CreateGame());
+        Thread.sleep(1000);
+        assertFalse(Game.instance().getGameId().isEmpty());
+        assertEquals(Game.instance().getState().getClass(), Waiting.class);
+
+        // Register
+        StompSession.Subscription subscriptionRegister = websocketService.subscribe("/topic/register");
+        websocketService.send("/app/"+Game.instance().getGameId() +"/register", new RegisterForGame());
+        Thread.sleep(2000);
     }
 
 

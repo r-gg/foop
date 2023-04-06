@@ -10,6 +10,12 @@ public abstract class Entity {
         this.y = y;
     }
 
+    public Entity(String id, int x, int y) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+    }
+
     public String getId() {
         return id;
     }
