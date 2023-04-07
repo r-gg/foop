@@ -1,6 +1,7 @@
 package foop.a1.client.states.waiting;
 
 import foop.a1.client.main.Game;
+import foop.a1.client.messages.request.StartGame;
 import foop.a1.client.states.State;
 import foop.a1.client.states.playing.Playing;
 
@@ -20,7 +21,6 @@ public class Waiting extends State {
 
     public Waiting() {
         loadImages();
-        System.out.println("waiting called");
         //Game.instance().subscribeToGame();
     }
 
@@ -40,7 +40,9 @@ public class Waiting extends State {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Game.instance().nextState(new Playing());
+        StartGame startGame = new StartGame();
+        startGame.setGameId(Game.instance().getGameId());
+        Game.instance().sendGameStart(startGame);
     }
 
     @Override
