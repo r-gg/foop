@@ -5,7 +5,7 @@ note
 	revision: "1.0.1"
 
 class
-	MAIN_WINDOW
+	FOOP_MAIN_WINDOW
 
 inherit
 	EV_TITLED_WINDOW
@@ -15,7 +15,7 @@ inherit
 			is_in_default_state
 		end
 
-	INTERFACE_NAMES
+	FOOP_CONSTANTS
 		export
 			{NONE} all
 		undefine
@@ -30,8 +30,6 @@ feature {NONE} -- Initialization
 	create_interface_objects
 			-- <Precursor>
 		do
-				-- Create main container.
-			create main_container
 				-- Create the menu bar.
 			create standard_menu_bar
 				-- Create game menu.
@@ -51,6 +49,8 @@ feature {NONE} -- Initialization
 
 			build_main_container
 			extend (main_container)
+
+			request_new_game
 
 				-- Execute `request_close_window' when the user clicks
 				-- on the cross in the title bar.
@@ -132,13 +132,72 @@ feature {NONE} -- About Dialog Implementation
 	on_about
 			-- Display the About dialog.
 		local
-			about_dialog: ABOUT_DIALOG
+			about_dialog: FOOP_ABOUT_DIALOG
 		do
 			create about_dialog
 			about_dialog.show_modal_to_window (Current)
 		end
 
-feature {NONE} -- Implementation, Events
+feature {NONE} -- Implementation / Constants
+
+	Window_title: STRING = "foop"
+			-- Title of the window.
+
+	Window_width: INTEGER = 2800
+			-- Initial width for this window.
+
+	Window_height: INTEGER = 1880
+			-- Initial height for this window.
+feature {NONE} -- Implementation / Attributes
+
+	main_container: EV_VERTICAL_BOX
+			-- Main container (contains all widgets displayed in this window)
+
+	world: EV_MODEL_WORLD
+
+	area: EV_DRAWING_AREA
+
+	buffer: EV_PIXMAP
+
+	projector: EV_MODEL_DRAWING_AREA_PROJECTOR
+
+feature {NONE} -- Implementation
+
+	build_main_container
+			-- Create and populate `main_container'.
+		require
+			main_container_not_yet_created: main_container = Void
+		local
+			l_bg: EV_PIXMAP
+			l_bg_pic: EV_MODEL_PICTURE
+		do
+			create main_container
+
+			create world
+			create area
+			create buffer.make_with_size (window_width, window_height)
+			create projector.make_with_buffer (world, buffer, area)
+
+				-- add the drawing area to the container
+			main_container.extend (area)
+
+				-- Create the background pixmap
+			create l_bg
+			l_bg.set_with_named_file (file_system.pathname_to_string (img_background))
+
+				-- Create background image for model world (base on l_bg pixmap)
+			create l_bg_pic.make_with_pixmap (l_bg)
+
+				-- Add background to the world
+			world.extend (l_bg_pic)
+
+				-- Refresh the drawing area
+			projector.project
+		ensure
+			main_container_created: main_container /= Void
+		end
+
+feature {NONE} -- Events
 
 	request_close_window
 			-- Process user request to close the window.
@@ -162,34 +221,22 @@ feature {NONE} -- Implementation, Events
 	request_new_game
 			-- Process user request to create a new game.
 		local
-			game: GAME
+			l_pixmap: EV_PIXMAP
+			l_player: FOOP_PLAYER
 		do
-			create game.make
-			game.start
+				-- Create pixmap
+			create l_pixmap
+			l_pixmap.set_with_named_file (file_system.pathname_to_string (img_cat))
+
+				-- Create player
+			create l_player.make_with_pixmap (l_pixmap)
+
+				-- Add player to the world
+			world.extend (l_player)
+			l_player.set_point_position (40, 100)
+
+				-- Refresh the drawing area
+			projector.project
 		end
 
-feature {NONE} -- Implementation
-
-	main_container: EV_VERTICAL_BOX
-			-- Main container (contains all widgets displayed in this window).
-
-	build_main_container
-			-- Populate `main_container'.
-		do
-			main_container.extend (create {EV_TEXT})
-		ensure
-			main_container_created: main_container /= Void
-		end
-
-feature {NONE} -- Implementation / Constants
-
-	Window_title: STRING = "foop"
-			-- Title of the window.
-
-	Window_width: INTEGER = 2880
-			-- Initial width for this window.
-
-	Window_height: INTEGER = 1800
-			-- Initial height for this window.
 end
-

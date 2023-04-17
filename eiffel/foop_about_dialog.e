@@ -5,7 +5,7 @@ note
 	revision: "1.0.1"
 
 class
-	ABOUT_DIALOG
+	FOOP_ABOUT_DIALOG
 
 inherit
 	EV_DIALOG
@@ -14,7 +14,7 @@ inherit
 			initialize
 		end
 
-	INTERFACE_NAMES
+	FOOP_CONSTANTS
 		export
 			{NONE} all
 		undefine
@@ -130,13 +130,12 @@ feature {NONE} -- Implementation
 
 	ok_button: EV_BUTTON
 			-- "OK" button.
-
 feature {NONE} -- Implementation / Constants
 
 	Default_title: STRING = "About Dialog"
 			-- Default title for the dialog window.
 
 	Default_message: STRING =
-		"FOOP Team F%N%
-		%To start a new game select Game > New"
+			"FOOP Team F%NTo start a new game select Game > New"
+
 end

@@ -5,9 +5,44 @@ note
 	revision: "1.0.1"
 
 class
-	INTERFACE_NAMES
+	FOOP_CONSTANTS
+
+inherit
+	ANY
+		export {FOOP_CONSTANTS}
+			all
+		end
+	KL_SHARED_FILE_SYSTEM
+			-- use KL_SHARED_FILE_SYSTEM (from Gobo Kernel library) to make file paths OS independent
+		export {NONE}
+			all
+		end
 
 feature -- Access
+
+	Image_folder: STRING = "static"
+
+	img_path: KL_PATHNAME
+			-- Path for image folder of main_ui
+		do
+			create Result.make
+			Result.set_relative (True)
+			Result.append_name (Image_folder)
+		end
+
+	img_background: KL_PATHNAME
+			-- Path to "background" image
+		do
+			Result := img_path
+			Result.append_name ("background.png")
+		end
+
+	img_cat: KL_PATHNAME
+			-- Path to cat image
+		do
+			Result := img_path
+			Result.append_name ("cat.png")
+		end
 
 	Button_ok_item: STRING = "OK"
 			-- String for "OK" buttons.
@@ -32,3 +67,4 @@ feature -- Access
 			-- when the user try to close the first window.
 
 end
+
