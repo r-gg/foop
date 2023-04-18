@@ -30,11 +30,8 @@ feature {NONE} -- Initialization
 	create_interface_objects
 			-- <Precursor>
 		do
-				-- Create the menu bar.
 			create standard_menu_bar
-				-- Create game menu.
 			create game_menu.make_with_text (Menu_game_item)
-				-- Create help menu.
 			create help_menu.make_with_text (Menu_help_item)
 		end
 
@@ -43,7 +40,6 @@ feature {NONE} -- Initialization
 		do
 			Precursor {EV_TITLED_WINDOW}
 
-				-- Create and add the menu bar.
 			build_standard_menu_bar
 			set_menu_bar (standard_menu_bar)
 
@@ -154,12 +150,16 @@ feature {NONE} -- Implementation / Attributes
 			-- Main container (contains all widgets displayed in this window)
 
 	world: EV_MODEL_WORLD
+			-- model world
 
 	area: EV_DRAWING_AREA
+			-- drawing area
 
 	buffer: EV_PIXMAP
+			-- buffer
 
 	projector: EV_MODEL_DRAWING_AREA_PROJECTOR
+			-- projector
 
 feature {NONE} -- Implementation
 
@@ -221,22 +221,24 @@ feature {NONE} -- Events
 	request_new_game
 			-- Process user request to create a new game.
 		local
-			l_pixmap: EV_PIXMAP
-			l_player: FOOP_PLAYER
+			l_game: FOOP_GAME
+			l_pixmap_cat: EV_PIXMAP
+			l_pixmap_mouse: EV_PIXMAP
+			l_pixmap_entrance: EV_PIXMAP
 		do
-				-- Create pixmap
-			create l_pixmap
-			l_pixmap.set_with_named_file (file_system.pathname_to_string (img_cat))
+				-- cat image
+			create l_pixmap_cat
+			l_pixmap_cat.set_with_named_file (file_system.pathname_to_string (img_cat))
 
-				-- Create player
-			create l_player.make_with_pixmap (l_pixmap)
+				-- mouse image
+			create l_pixmap_mouse
+			l_pixmap_mouse.set_with_named_file (file_system.pathname_to_string (img_mouse))
 
-				-- Add player to the world
-			world.extend (l_player)
-			l_player.set_point_position (40, 100)
+				-- entry image
+			create l_pixmap_entrance
+			l_pixmap_entrance.set_with_named_file (file_system.pathname_to_string (img_entrance))
 
-				-- Refresh the drawing area
-			projector.project
+			create l_game.make (world, projector, l_pixmap_cat, l_pixmap_mouse, l_pixmap_entrance)
 		end
 
 end

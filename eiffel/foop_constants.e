@@ -44,6 +44,20 @@ feature -- Access
 			Result.append_name ("cat.png")
 		end
 
+	img_mouse: KL_PATHNAME
+			-- Path to cat image
+		do
+			Result := img_path
+			Result.append_name ("mouse.png")
+		end
+
+	img_entrance: KL_PATHNAME
+			-- Path to cat image
+		do
+			Result := img_path
+			Result.append_name ("entrance.png")
+		end
+
 	Button_ok_item: STRING = "OK"
 			-- String for "OK" buttons.
 
