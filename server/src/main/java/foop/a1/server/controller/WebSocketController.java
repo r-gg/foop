@@ -9,10 +9,14 @@ import foop.a1.server.service.GameService;
 import foop.a1.server.util.GameStatus;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
@@ -26,6 +30,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @Controller
 public class WebSocketController {
@@ -72,7 +77,7 @@ public class WebSocketController {
         var gameOpt = gameService.getGame(gameId);
         if (gameOpt.isEmpty()) {
             logger.info("Game {}: Game not found", gameId);
-            messagingTemplate.convertAndSend("/topic/register", new RegistrationResult(){{setSuccessful(false);}});
+            messagingTemplate.convertAndSendToUser(registerForGame.getUsername(),"/queue/"+gameId+"/register", new RegistrationResult(){{setSuccessful(false);}});
             return;
         }
 
@@ -83,7 +88,7 @@ public class WebSocketController {
         var gameDto = new GameDTO(game.getGameId(), game.getStatus().toString());
 
         logger.info("Game {} Player {}: Registration successful", game.getGameId(), playerId);
-        messagingTemplate.convertAndSend("/topic/register", new RegistrationResult(gameDto, playerDto));
+        messagingTemplate.convertAndSendToUser( registerForGame.getUsername(), "/queue/"+gameId+"/register", new RegistrationResult(gameDto, playerDto));
     }
 
     public void positionUpdate(Game game) throws ExecutionException, InterruptedException, TimeoutException {
@@ -124,18 +129,36 @@ public class WebSocketController {
             }
         });
 
+        var gameDTOGameBoardDTOPair = gameToGameDTO(game);
+        var statusUpdate = new StatusUpdate(gameDTOGameBoardDTOPair.getFirst(), gameDTOGameBoardDTOPair.getSecond());
+
+        var session = futureSession.get(1, TimeUnit.SECONDS);
+        session.send(String.format("/%s/status", game.getGameId()), statusUpdate);
+    }
+
+    private Pair<GameDTO, GameBoardDTO> gameToGameDTO(Game game){
         var subwaysDtos = game.getBoard().getSubways()
                 .stream().map(subway -> new SubwayDTO(
                         (PositionDTO[]) Arrays.stream(subway.getEntrances()).map(position -> new PositionDTO(position.x(), position.y())).toArray(),
                         subway.getMice().stream().map(mouse -> new MouseDTO(new PositionDTO(mouse.getPosition().x(), mouse.getPosition().y()))).toList()
                 )).toList();
 
-        var gameBoardDto = new GameBoardDTO(game.getBoard().getRoot(), game.getBoard().getDimensions(), subwaysDtos);
-        var gameDto = new GameDTO(game.getGameId(), game.getStatus().toString());
-        var statusUpdate = new StatusUpdate(gameDto, gameBoardDto);
+        var playersDtos = game.getPlayers().stream()
+                .map(player -> new PlayerDTO(player.getPlayerId() ,
+                        new PositionDTO(player.getPosition().x(), player.getPosition().y())))
+                .toList();
 
-        var session = futureSession.get(1, TimeUnit.SECONDS);
-        session.send(String.format("/%s/status", game.getGameId()), statusUpdate);
+        var miceDtos = game.getMice().stream()
+                .map(mouse -> new MouseDTO(new PositionDTO(mouse.getPosition().x(), mouse.getPosition().y())))
+                .toList();
+
+        var gameBoardDto = new GameBoardDTO(game.getBoard().getRoot(),
+                game.getBoard().getDimensions(),
+                subwaysDtos,
+                playersDtos,
+                miceDtos
+        );
+        return Pair.of(new GameDTO(game.getGameId(), game.getStatus().toString()), gameBoardDto);
     }
 
     private void handlePositionUpdate(String gameId, CurrentPosition currentPosition) {

@@ -77,4 +77,12 @@ public class Playing extends State {
     public void setPlayers(List<Player> players) {
         this.players = players;
     }
+
+    public Enemy[] getEnemies() {
+        return enemies;
+    }
+
+    public SubwayEntrance[] getSubwayEntrances() {
+        return subwayEntrances;
+    }
 }

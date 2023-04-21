@@ -114,6 +114,7 @@ public class Game implements Runnable {
 
     public void subscribeToGame(){
         websocketService.subscribe("/topic/"+instance().gameId+"/register");
+        websocketService.subscribe("/topic/"+instance().gameId+"/start");
         websocketService.subscribe("/topic/"+instance().gameId+"/update");
     }
 

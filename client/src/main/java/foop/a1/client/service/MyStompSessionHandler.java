@@ -2,10 +2,11 @@ package foop.a1.client.service;
 
 import foop.a1.client.main.Game;
 import foop.a1.client.messages.Message;
-import foop.a1.client.messages.ServerMessage;
 import foop.a1.client.messages.response.AllGames;
 import foop.a1.client.messages.response.RegistrationResult;
 import foop.a1.client.messages.response.SingleGame;
+import foop.a1.client.messages.response.StartGame;
+import org.hibernate.sql.ast.tree.expression.Star;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
+import java.net.ProtocolException;
 import java.util.HashMap;
 
 
@@ -45,14 +47,21 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
     public Type getPayloadType(StompHeaders headers) {
         String destination = headers.getDestination();
         LOGGER.info("Determining payload type for '{}'", destination);
+        if(destination.endsWith("/start")){
+            return StartGame.class;
+        }
         return destination2responseType.get(destination);
     }
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-        if(payload instanceof ServerMessage){
+        if(payload instanceof Message){
             LOGGER.info("Handling frame: \n\tPayload = {} of type {}, \n\tDestination = {}", payload, payload.getClass() , headers.getDestination());
-            protocolHandler.handleResponse(headers, (ServerMessage) payload);
+            try {
+                protocolHandler.handleResponse(headers, payload);
+            } catch (ProtocolException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

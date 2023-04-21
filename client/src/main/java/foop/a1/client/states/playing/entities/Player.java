@@ -20,6 +20,10 @@ public class Player extends Entity {
         super(x, y);
     }
 
+    public Player(String id, int x, int y) {
+        super(id, x, y);
+    }
+
     public void update() {
         updatePos();
     }

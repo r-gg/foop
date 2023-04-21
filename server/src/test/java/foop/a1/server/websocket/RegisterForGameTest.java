@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class RegisterForGameTest {
     @LocalServerPort
-    private final int port = 8082;
+    private int port = 8082;
     private String URL;
 
     @BeforeEach
@@ -38,6 +38,7 @@ public class RegisterForGameTest {
     @Test
     public void testRegisterForGameSuccessful() throws ExecutionException, InterruptedException, TimeoutException {
         var gameId = createGame();
+        String username = "player1";
 
         var client = new StandardWebSocketClient();
         var stompClient = new WebSocketStompClient(client);
@@ -45,6 +46,7 @@ public class RegisterForGameTest {
 
         final RegistrationResult[] registrationResult = new RegistrationResult[1];
         var futureSession = stompClient.connectAsync(URL, new StompSessionHandlerAdapter() {
+
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return RegistrationResult.class;
@@ -52,7 +54,8 @@ public class RegisterForGameTest {
 
             @Override
             public void afterConnected(StompSession session, StompHeaders headers) {
-                session.subscribe("/topic/register", this);
+                System.out.println("Connected for register");
+                session.subscribe("/user/"+username+"/queue/"+gameId+"/register", this);
             }
 
             @Override
@@ -62,10 +65,11 @@ public class RegisterForGameTest {
         });
 
         var registerForGame = new RegisterForGame();
+        registerForGame.setUsername("player1");
         var session = futureSession.get(1, TimeUnit.SECONDS);
         session.send(String.format("/app/%s/register", gameId), registerForGame);
 
-        Thread.sleep(100);
+        Thread.sleep(1000);
         assertNotNull(registrationResult[0]);
         assertTrue(registrationResult[0].isSuccessful());
         assertNotNull(registrationResult[0].getPlayer());
@@ -75,6 +79,7 @@ public class RegisterForGameTest {
     @Test
     public void testRegisterForGameNotSuccessful() throws ExecutionException, InterruptedException, TimeoutException {
         var gameId = "12341234";
+        String username = "player1";
 
         var client = new StandardWebSocketClient();
         var stompClient = new WebSocketStompClient(client);
@@ -89,7 +94,7 @@ public class RegisterForGameTest {
 
             @Override
             public void afterConnected(StompSession session, StompHeaders headers) {
-                session.subscribe("/topic/register", this);
+                session.subscribe("/user/"+username+"/queue/"+gameId+"/register", this);
             }
 
             @Override
@@ -99,6 +104,7 @@ public class RegisterForGameTest {
         });
 
         var registerForGame = new RegisterForGame();
+        registerForGame.setUsername(username);
         var session = futureSession.get(1, TimeUnit.SECONDS);
         session.send(String.format("/app/%s/register", gameId), registerForGame);
 
@@ -132,7 +138,6 @@ public class RegisterForGameTest {
         });
 
         var createGame = new CreateGame();
-
         var session = futureSession.get(1, TimeUnit.SECONDS);
         session.send("/app/games/create", createGame);
         Thread.sleep(100);
