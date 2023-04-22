@@ -3,22 +3,22 @@ package foop.a1.server.dto;
 import java.util.List;
 
 public class SubwayDTO {
-    private PositionDTO[] entrances;
+    private List<PositionDTO> entrances;
     private List<MouseDTO> mice;
 
     public SubwayDTO() {
     }
 
-    public SubwayDTO(PositionDTO[] entrances, List<MouseDTO> mice) {
+    public SubwayDTO(List<PositionDTO> entrances, List<MouseDTO> mice) {
         this.entrances = entrances;
         this.mice = mice;
     }
 
-    public PositionDTO[] getEntrances() {
+    public List<PositionDTO> getEntrances() {
         return entrances;
     }
 
-    public void setEntrances(PositionDTO[] entrances) {
+    public void setEntrances(List<PositionDTO> entrances) {
         this.entrances = entrances;
     }
 

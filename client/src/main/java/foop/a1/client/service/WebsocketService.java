@@ -1,6 +1,8 @@
 package foop.a1.client.service;
 
 import foop.a1.client.main.Game;
+import foop.a1.client.messages.request.CreateGame;
+import foop.a1.client.messages.request.StartGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +23,6 @@ public class WebsocketService {
 
     private Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-
     private StandardWebSocketClient client;
     private WebSocketStompClient stompClient;
 
@@ -41,16 +42,14 @@ public class WebsocketService {
         client = new StandardWebSocketClient();
         stompClient = new WebSocketStompClient(client);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        connect();
-        subscribe("/topic/games/create");
-        subscribe("/topic/games");
-        Game.setWebsocketService(this);
+        connect(URL);
+        System.setProperty("java.awt.headless", "false");
+        Game.instance();
+        Game.instance().setWebsocketService(this);
     }
 
-
-
-    public void connect(){
-        CompletableFuture<StompSession> futureSession = stompClient.connectAsync(URL, sessionHandler);
+    public void connect(String url){
+        CompletableFuture<StompSession> futureSession = stompClient.connectAsync(url, sessionHandler);
         StompSession session = null;
         try {
             session = futureSession.get(2, TimeUnit.SECONDS);
@@ -75,9 +74,15 @@ public class WebsocketService {
     }
 
     public StompSession.Subscription subscribe(String destination){
-        LOGGER.info("Subscribing to {}",destination);
+        LOGGER.info("Subscribing to {}", destination);
         return session.subscribe(destination, sessionHandler);
     }
 
+    public void sendGameCreate(CreateGame createGame) {
+        this.send("/app/games/create", createGame);
+    }
 
+    public void sendGameStart(StartGame startGame) {
+        this.send("/app/games/start", startGame);
+    }
 }

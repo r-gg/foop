@@ -4,20 +4,19 @@ import foop.a1.client.dto.GameBoardDTO;
 import foop.a1.client.dto.GameDTO;
 import foop.a1.client.messages.Message;
 
-public class StartGame implements Message {
+public class GameStarted implements Message {
 
 
     private GameBoardDTO gameBoardDTO;
 
-    private GameDTO game;
+    private GameDTO gameDTO;
 
-    public StartGame(){
-
+    public GameStarted(){
     }
 
-    public StartGame(GameBoardDTO gameBoardDTO, GameDTO game) {
+    public GameStarted(GameBoardDTO gameBoardDTO, GameDTO gameDTO) {
         this.gameBoardDTO = gameBoardDTO;
-        this.game = game;
+        this.gameDTO = gameDTO;
     }
 
     public GameBoardDTO getGameBoardDTO() {
@@ -28,11 +27,11 @@ public class StartGame implements Message {
         this.gameBoardDTO = gameBoardDTO;
     }
 
-    public GameDTO getGame() {
-        return game;
+    public GameDTO getGameDTO() {
+        return gameDTO;
     }
 
-    public void setGame(GameDTO game) {
-        this.game = game;
+    public void setGameDTO(GameDTO game) {
+        this.gameDTO = game;
     }
 }

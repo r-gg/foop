@@ -4,7 +4,6 @@ import foop.a1.client.messages.request.CreateGame;
 import foop.a1.client.states.quit.Quit;
 import foop.a1.client.states.State;
 import foop.a1.client.main.Game;
-import foop.a1.client.states.waiting.Waiting;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -26,7 +25,7 @@ public class Menu extends State {
         buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 50, 0, (Void v) -> {
             // create game button
             var createGame = new CreateGame();
-            Game.instance().sendGameCreate(createGame);
+            Game.service().sendGameCreate(createGame);
             return null;
         });
         buttons[1] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 150, 1, (Void v) -> {

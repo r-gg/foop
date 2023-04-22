@@ -3,7 +3,6 @@ package foop.a1.client.states.waiting;
 import foop.a1.client.main.Game;
 import foop.a1.client.messages.request.StartGame;
 import foop.a1.client.states.State;
-import foop.a1.client.states.playing.Playing;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,7 +20,7 @@ public class Waiting extends State {
 
     public Waiting() {
         loadImages();
-        //Game.instance().subscribeToGame();
+        Game.instance().subscribeToGame();
     }
 
     private void loadImages() {
@@ -40,9 +39,8 @@ public class Waiting extends State {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        StartGame startGame = new StartGame();
-        startGame.setGameId(Game.instance().getGameId());
-        Game.instance().sendGameStart(startGame);
+        StartGame startGame = new StartGame(Game.instance().getGameId());
+        Game.service().sendGameStart(startGame);
     }
 
     @Override

@@ -3,10 +3,10 @@ package foop.a1.client.main;
 import foop.a1.client.service.WebsocketService;
 import foop.a1.client.states.State;
 import foop.a1.client.states.menu.Menu;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.messaging.simp.stomp.StompSession;
 
 import java.awt.Graphics;
+import java.util.UUID;
 
 
 public class Game implements Runnable {
@@ -21,8 +21,10 @@ public class Game implements Runnable {
     public final static int GAME_HEIGHT = 448;
     private static Game instance;
     private static final Object mutex = new Object();
+//    final private String username = UUID.randomUUID().toString();
     private String gameId;
     private State state;
+    private StompSession.Subscription createGameSubscription;
 
     private Game() {
         gamePanel = new GamePanel();
@@ -118,8 +120,14 @@ public class Game implements Runnable {
         websocketService.subscribe("/topic/"+instance().gameId+"/update");
     }
 
-    public static void setWebsocketService(WebsocketService websocketService) {
+    public void setWebsocketService(WebsocketService websocketService) {
         Game.websocketService = websocketService;
+        createGameSubscription = websocketService.subscribe("/topic/games/create");
+//        websocketService.subscribe("/topic/games");
+    }
+
+    public static WebsocketService service() {
+        return websocketService;
     }
 
     public String getGameId() {

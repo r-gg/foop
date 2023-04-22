@@ -4,7 +4,6 @@ import foop.a1.server.util.Constants;
 import foop.a1.server.util.GameStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
@@ -24,6 +23,20 @@ public class Game implements Runnable {
     public Game() {
         gameId = UUID.randomUUID().toString();
         status = GameStatus.WAITING;
+
+        // test mice
+        var mouse1 = new Mouse();
+        mouse1.setPosition(new Position(50, 300));
+        this.mice.add(mouse1);
+        var mouse2 = new Mouse();
+        mouse2.setPosition(new Position(10, 100));
+        this.mice.add(mouse2);
+        var mouse3 = new Mouse();
+        mouse3.setPosition(new Position(20, 250));
+        this.mice.add(mouse3);
+        var mouse4 = new Mouse();
+        mouse4.setPosition(new Position(170, 220));
+        this.mice.add(mouse4);
     }
 
     public void addPlayer(Player player) {

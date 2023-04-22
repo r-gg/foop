@@ -1,15 +1,14 @@
 package foop.a1.client.service;
 
-import foop.a1.client.main.Game;
 import foop.a1.client.messages.Message;
 import foop.a1.client.messages.response.AllGames;
 import foop.a1.client.messages.response.RegistrationResult;
 import foop.a1.client.messages.response.SingleGame;
-import foop.a1.client.messages.response.StartGame;
-import org.hibernate.sql.ast.tree.expression.Star;
+import foop.a1.client.messages.response.GameStarted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
@@ -48,13 +47,14 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
         String destination = headers.getDestination();
         LOGGER.info("Determining payload type for '{}'", destination);
         if(destination.endsWith("/start")){
-            return StartGame.class;
+            return GameStarted.class;
         }
         return destination2responseType.get(destination);
     }
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
+        System.out.println("111");
         if(payload instanceof Message){
             LOGGER.info("Handling frame: \n\tPayload = {} of type {}, \n\tDestination = {}", payload, payload.getClass() , headers.getDestination());
             try {
@@ -63,5 +63,11 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+        LOGGER.error(exception.toString());
+        super.handleException(session, command, headers, payload, exception);
     }
 }
