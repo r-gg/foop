@@ -33,14 +33,13 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
     private final HashMap<String, Type> destination2responseType = new HashMap<>(){{
         put("/topic/games/create", SingleGame.class);
         put("/topic/games", AllGames.class);
-        put("/topic/register", RegistrationResult.class);
+        put("/user/queue/register", RegistrationResult.class);
     }};
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
         LOGGER.info("Client connected");
         super.afterConnected(session, connectedHeaders);
     }
-
 
     @Override
     public Type getPayloadType(StompHeaders headers) {
@@ -54,7 +53,6 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
 
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
-        System.out.println("111");
         if(payload instanceof Message){
             LOGGER.info("Handling frame: \n\tPayload = {} of type {}, \n\tDestination = {}", payload, payload.getClass() , headers.getDestination());
             try {

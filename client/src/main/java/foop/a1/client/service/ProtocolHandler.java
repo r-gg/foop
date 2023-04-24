@@ -65,10 +65,12 @@ public class ProtocolHandler {
     private void handleResponse(RegistrationResult registrationResult){
         if(registrationResult.isSuccessful()){
             LOGGER.info("Registration successful");
+            var playerDto = registrationResult.getPlayer();
+            var player = new Player(playerDto.getPlayerId(), playerDto.getPosition().getX(), playerDto.getPosition().getY());
+            Game.instance().setCurrentPlayer(player);
         }else {
             LOGGER.error("Registration failed");
         }
-
     }
 
 //    private void handleResponse(AllGames allGames){
@@ -93,6 +95,7 @@ public class ProtocolHandler {
             }
         }
         playing.setSubwayEntrances(entrances);
+        playing.setPlayer(Game.instance().getCurrentPlayer());
 
         Game.instance().nextState(playing);
     }

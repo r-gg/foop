@@ -11,19 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Playing extends State {
-    private final Player player;
+    private Player player;
     private List<Player> players = new ArrayList<>();
     private List<Enemy> enemies = new ArrayList<>();
 
     private List<SubwayEntrance> subwayEntrances = new ArrayList<>();
 
     public Playing() {
-        player = new Player();
     }
 
     @Override
     public void draw(Graphics g) {
-        player.render(g);
+        if (player != null) {
+            player.render(g);
+        }
 
         for (var player : players)
             player.render(g);
@@ -37,7 +38,9 @@ public class Playing extends State {
 
     @Override
     public void update() {
-        player.update();
+        if (player != null) {
+            player.update();
+        }
     }
 
     @Override
@@ -66,6 +69,10 @@ public class Playing extends State {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public List<Enemy> getEnemies() {

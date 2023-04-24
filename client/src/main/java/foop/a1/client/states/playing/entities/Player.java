@@ -11,17 +11,9 @@ public class Player extends Entity {
     private BufferedImage animation;
     private boolean left, up, right, down;
 
-    public Player() {
-        super(0, 0);
-        loadAnimation();
-    }
-
-    public Player(int x, int y) {
-        super(x, y);
-    }
-
     public Player(String id, int x, int y) {
         super(id, x, y);
+        loadAnimation();
     }
 
     public void update() {

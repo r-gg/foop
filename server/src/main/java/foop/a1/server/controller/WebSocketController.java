@@ -10,14 +10,13 @@ import foop.a1.server.service.GameService;
 import foop.a1.server.util.GameStatus;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -71,24 +70,25 @@ public class WebSocketController {
     }
 
     @MessageMapping("/{gameId}/register")
-    public void registerForGame(@DestinationVariable String gameId, RegisterForGame registerForGame) {
+    public void registerForGame(@DestinationVariable String gameId, RegisterForGame registerForGame, SimpMessageHeaderAccessor headerAccessor) {
         logger.info("Game {}: Trying to register new player", gameId);
 
         var gameOpt = gameService.getGame(gameId);
         if (gameOpt.isEmpty()) {
             logger.info("Game {}: Game not found", gameId);
-            messagingTemplate.convertAndSendToUser(registerForGame.getUsername(),"/queue/"+gameId+"/register", new RegistrationResult(){{setSuccessful(false);}});
+            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),"/queue/register", new RegistrationResult(){{setSuccessful(false);}});
             return;
         }
 
+        var userId = headerAccessor.getUser().getName();
         var game = gameOpt.get();
-        var playerId = gameService.registerPlayer(game);
+        var playerId = gameService.registerPlayer(game, userId);
 
         var playerDto = new PlayerDTO(playerId, new PositionDTO(0, 0));
         var gameDto = new GameDTO(game.getGameId(), game.getStatus().toString());
 
         logger.info("Game {} Player {}: Registration successful", game.getGameId(), playerId);
-        messagingTemplate.convertAndSendToUser( registerForGame.getUsername(), "/queue/"+gameId+"/register", new RegistrationResult(gameDto, playerDto));
+        messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(), "/queue/register", new RegistrationResult(gameDto, playerDto));
     }
 
     @MessageMapping("/games/start")

@@ -1,11 +1,16 @@
 package foop.a1.client.main;
 
+import foop.a1.client.messages.request.RegisterForGame;
 import foop.a1.client.service.WebsocketService;
 import foop.a1.client.states.State;
 import foop.a1.client.states.menu.Menu;
+import foop.a1.client.states.playing.entities.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.stomp.StompSession;
 
 import java.awt.Graphics;
+import java.lang.invoke.MethodHandles;
 import java.util.UUID;
 
 
@@ -21,10 +26,10 @@ public class Game implements Runnable {
     public final static int GAME_HEIGHT = 448;
     private static Game instance;
     private static final Object mutex = new Object();
-//    final private String username = UUID.randomUUID().toString();
     private String gameId;
     private State state;
     private StompSession.Subscription createGameSubscription;
+    private Player currentPlayer;
 
     private Game() {
         gamePanel = new GamePanel();
@@ -111,13 +116,16 @@ public class Game implements Runnable {
 
     public void nextState(State state) {
         this.state = state;
-        // TODO: Maybe redraw here because it is called from the SingleGame.class
     }
 
     public void subscribeToGame(){
-        websocketService.subscribe("/topic/"+instance().gameId+"/register");
+        websocketService.subscribe("/user/queue/register");
         websocketService.subscribe("/topic/"+instance().gameId+"/start");
         websocketService.subscribe("/topic/"+instance().gameId+"/update");
+
+        var registerForGame = new RegisterForGame();
+        registerForGame.setUsername(UUID.randomUUID().toString());
+        Game.service().sendRegisterForGame(this.gameId, registerForGame);
     }
 
     public void setWebsocketService(WebsocketService websocketService) {
@@ -136,5 +144,13 @@ public class Game implements Runnable {
 
     public void setGameId(String gameId) {
         this.gameId = gameId;
+    }
+
+    public void setCurrentPlayer(Player player) {
+        this.currentPlayer = player;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 }

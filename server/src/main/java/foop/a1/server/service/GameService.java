@@ -4,6 +4,7 @@ import foop.a1.server.dto.*;
 import foop.a1.server.entities.Game;
 import foop.a1.server.entities.GameBoard;
 import foop.a1.server.entities.Player;
+import foop.a1.server.entities.Position;
 import foop.a1.server.messages.response.GameStarted;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
@@ -55,12 +56,11 @@ public class GameService {
         this.games.remove(game);
     }
 
-    public String registerPlayer(Game game) {
-        var player = new Player();
+    public String registerPlayer(Game game, String userId) {
+        var player = new Player(userId);
+        // initial position
+        player.setPosition(new Position(40, 40));
         game.addPlayer(player);
-        if(game.getPlayers().size() == PLAYERS_NEEDED){
-            startGame(game);
-        }
 
         return player.getPlayerId();
     }
