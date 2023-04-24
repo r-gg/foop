@@ -124,7 +124,6 @@ public class Game implements Runnable {
         websocketService.subscribe("/topic/"+instance().gameId+"/update");
 
         var registerForGame = new RegisterForGame();
-        registerForGame.setUsername(UUID.randomUUID().toString());
         Game.service().sendRegisterForGame(this.gameId, registerForGame);
     }
 

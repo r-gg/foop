@@ -73,14 +73,15 @@ public class WebSocketController {
     public void registerForGame(@DestinationVariable String gameId, RegisterForGame registerForGame, SimpMessageHeaderAccessor headerAccessor) {
         logger.info("Game {}: Trying to register new player", gameId);
 
+        var userId = headerAccessor.getUser().getName();
         var gameOpt = gameService.getGame(gameId);
         if (gameOpt.isEmpty()) {
             logger.info("Game {}: Game not found", gameId);
-            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),"/queue/register", new RegistrationResult(){{setSuccessful(false);}});
+            messagingTemplate.convertAndSendToUser(userId,"/queue/register", new RegistrationResult(){{setSuccessful(false);}});
             return;
         }
 
-        var userId = headerAccessor.getUser().getName();
+
         var game = gameOpt.get();
         var playerId = gameService.registerPlayer(game, userId);
 
@@ -88,7 +89,7 @@ public class WebSocketController {
         var gameDto = new GameDTO(game.getGameId(), game.getStatus().toString());
 
         logger.info("Game {} Player {}: Registration successful", game.getGameId(), playerId);
-        messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(), "/queue/register", new RegistrationResult(gameDto, playerDto));
+        messagingTemplate.convertAndSendToUser(userId, "/queue/register", new RegistrationResult(gameDto, playerDto));
     }
 
     @MessageMapping("/games/start")
