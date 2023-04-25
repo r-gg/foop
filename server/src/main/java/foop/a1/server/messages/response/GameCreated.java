@@ -3,13 +3,13 @@ package foop.a1.server.messages.response;
 import foop.a1.server.dto.GameDTO;
 import foop.a1.server.messages.Message;
 
-public class SingleGame implements Message {
+public class GameCreated implements Message {
     private GameDTO game;
 
-    public SingleGame() {
+    public GameCreated() {
     }
 
-    public SingleGame(GameDTO game) {
+    public GameCreated(GameDTO game) {
         this.game = game;
     }
 

@@ -3,7 +3,7 @@ package foop.a1.server.websocket;
 import foop.a1.server.messages.request.CreateGame;
 import foop.a1.server.messages.request.RegisterForGame;
 import foop.a1.server.messages.response.RegistrationResult;
-import foop.a1.server.messages.response.SingleGame;
+import foop.a1.server.messages.response.GameCreated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -122,7 +122,7 @@ public class RegisterForGameTest {
         var futureSession = stompClient.connectAsync(URL, new StompSessionHandlerAdapter() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return SingleGame.class;
+                return GameCreated.class;
             }
 
             @Override
@@ -132,7 +132,7 @@ public class RegisterForGameTest {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                var game = (SingleGame) payload;
+                var game = (GameCreated) payload;
                 gameId[0] = game.getGame().getGameId();
             }
         });

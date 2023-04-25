@@ -4,6 +4,7 @@ import foop.a1.client.main.Game;
 import foop.a1.client.messages.request.CreateGame;
 import foop.a1.client.messages.request.RegisterForGame;
 import foop.a1.client.messages.request.StartGame;
+import foop.a1.client.messages.request.UpdatePosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,5 +96,9 @@ public class WebsocketService {
 
     public void sendRegisterForGame(String gameId, RegisterForGame registerForGame) {
         this.send("/app/" + gameId + "/register", registerForGame);
+    }
+
+    public void sendUpdatePosition(UpdatePosition updatePosition) {
+        this.send("/app/games/update-position", updatePosition);
     }
 }

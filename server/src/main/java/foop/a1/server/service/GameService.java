@@ -6,6 +6,7 @@ import foop.a1.server.entities.GameBoard;
 import foop.a1.server.entities.Player;
 import foop.a1.server.entities.Position;
 import foop.a1.server.messages.response.GameStarted;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,6 +16,7 @@ import java.util.*;
 
 @Service
 public class GameService {
+    private final Logger logger;
     private final List<Game> games = new ArrayList<>();
 
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -22,7 +24,8 @@ public class GameService {
     @Value("${game.players}")
     private int PLAYERS_NEEDED;
 
-    public GameService(SimpMessagingTemplate simpMessagingTemplate) {
+    public GameService(Logger logger, SimpMessagingTemplate simpMessagingTemplate) {
+        this.logger = logger;
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
@@ -71,6 +74,15 @@ public class GameService {
 
     public Optional<Player> getPlayer(Game game, String playerId) {
         return game.getPlayers().stream().filter(player -> Objects.equals(player.getPlayerId(), playerId)).findFirst();
+    }
+
+    public void updatePlayerPosition(Game game, String playerId, Position newPosition) {
+        var player = getPlayer(game, playerId);
+        if (player.isEmpty()) {
+            this.logger.error("Player with id " + playerId + " not found in game" + game.getGameId());
+            return;
+        }
+        player.get().setPosition(newPosition);
     }
 
     private Pair<GameDTO, GameBoardDTO> gameToGameDTO(Game game){

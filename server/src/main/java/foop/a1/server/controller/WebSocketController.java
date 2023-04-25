@@ -66,7 +66,7 @@ public class WebSocketController {
         }
         var gameDto = new GameDTO(waitingGameId, GameStatus.WAITING.toString());
 
-        messagingTemplate.convertAndSend("/topic/games/create", new SingleGame(gameDto));
+        messagingTemplate.convertAndSend("/topic/games/create", new GameCreated(gameDto));
     }
 
     @MessageMapping("/{gameId}/register")
@@ -106,31 +106,23 @@ public class WebSocketController {
         logger.info("Game {} : Started successful", startGame.getGameId());
     }
 
-//    public void positionUpdate(Game game) throws ExecutionException, InterruptedException, TimeoutException {
-//        var client = new StandardWebSocketClient();
-//        var stompClient = new WebSocketStompClient(client);
-//        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-//
-//        var futureSession = stompClient.connectAsync(URL, new StompSessionHandlerAdapter() {
-//            @Override
-//            public Type getPayloadType(StompHeaders headers) {
-//                return CurrentPosition.class;
-//            }
-//
-//            @Override
-//            public void afterConnected(StompSession session, StompHeaders headers) {
-//                session.subscribe(String.format("/topic/%s/update", game.getGameId()), this);
-//            }
-//
-//            @Override
-//            public void handleFrame(StompHeaders headers, Object payload) {
-//                logger.info("Client received: payload {}, headers {}", payload, headers);
-//            }
-//        });
-//
-//        var session = futureSession.get(1, TimeUnit.SECONDS);
-//        session.send(String.format("/%s/update", game.getGameId()), new PositionUpdate());
-//    }
+    @MessageMapping("/games/update-position")
+    public void updatePosition(UpdatePosition updatePosition, SimpMessageHeaderAccessor headerAccessor) {
+        logger.info("Request to update position");
+        var gameOpt = gameService.getGame(updatePosition.getGameId());
+        if (gameOpt.isEmpty()) {
+            logger.info("Game {}: Game not found", updatePosition.getGameId());
+            return;
+        }
+        var userId = headerAccessor.getUser().getName();
+
+        Position newPos = new Position(updatePosition.getNewPosition().getX(), updatePosition.getNewPosition().getY());
+        gameService.updatePlayerPosition(gameOpt.get(), userId, newPos);
+        // TODO: check for success?
+        var positionUpdated = new PositionUpdated(updatePosition.getGameId(), userId, updatePosition.getNewPosition());
+        messagingTemplate.convertAndSend("/topic/games/" + updatePosition.getGameId() + "/position-updated", positionUpdated);
+        logger.info("Game {} : Updated position", updatePosition.getGameId());
+    }
 
 //    public void gameStatusUpdate(Game game) throws ExecutionException, InterruptedException, TimeoutException {
 //        var client = new StandardWebSocketClient();
@@ -149,26 +141,5 @@ public class WebSocketController {
 //
 //        var session = futureSession.get(1, TimeUnit.SECONDS);
 //        session.send(String.format("/%s/status", game.getGameId()), statusUpdate);
-//    }
-
-//    private void handlePositionUpdate(String gameId, CurrentPosition currentPosition) {
-//        logger.info("Game {} Player {}: Position update received", gameId, currentPosition.getPlayer().getPlayerId());
-//
-//        var gameOpt = gameService.getGame(gameId);
-//        if (gameOpt.isEmpty()) {
-//            logger.info("Game {}: Game not found", gameId);
-//            return;
-//        }
-//
-//        var game = gameOpt.get();
-//        var playerId = currentPosition.getPlayer().getPlayerId();
-//        var playerOpt = gameService.getPlayer(game, playerId);
-//        if (playerOpt.isEmpty()) {
-//            logger.info("Game {} Player {}: Player not found", gameId, playerId);
-//            return;
-//        }
-//
-//        var player = playerOpt.get();
-//        player.setPosition(new Position(currentPosition.getPlayer().getPosition().getY(), currentPosition.getPlayer().getPosition().getY()));
 //    }
 }

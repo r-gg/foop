@@ -1,5 +1,8 @@
 package foop.a1.client.states.playing;
 
+import foop.a1.client.dto.PositionDTO;
+import foop.a1.client.main.Game;
+import foop.a1.client.messages.request.UpdatePosition;
 import foop.a1.client.states.playing.entities.Enemy;
 import foop.a1.client.states.playing.entities.Player;
 import foop.a1.client.states.State;
@@ -18,6 +21,7 @@ public class Playing extends State {
     private List<SubwayEntrance> subwayEntrances = new ArrayList<>();
 
     public Playing() {
+        Game.instance().subscribeToPositionUpdates(); // TODO: unsubscribe
     }
 
     @Override
@@ -39,7 +43,16 @@ public class Playing extends State {
     @Override
     public void update() {
         if (player != null) {
+            var oldX = player.getX();
+            var oldY = player.getY();
             player.update();
+            if (oldX != player.getX() || oldY != player.getY()) {
+                // position changed, send to the server
+                UpdatePosition updatePositionReq = new UpdatePosition();
+                updatePositionReq.setGameId(Game.instance().getGameId());
+                updatePositionReq.setNewPosition(new PositionDTO(player.getX(), player.getY()));
+                Game.service().sendUpdatePosition(updatePositionReq);
+            }
         }
     }
 

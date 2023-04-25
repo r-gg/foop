@@ -5,13 +5,9 @@ import foop.a1.client.service.WebsocketService;
 import foop.a1.client.states.State;
 import foop.a1.client.states.menu.Menu;
 import foop.a1.client.states.playing.entities.Player;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.stomp.StompSession;
 
 import java.awt.Graphics;
-import java.lang.invoke.MethodHandles;
-import java.util.UUID;
 
 
 public class Game implements Runnable {
@@ -120,11 +116,15 @@ public class Game implements Runnable {
 
     public void subscribeToGame(){
         websocketService.subscribe("/user/queue/register");
-        websocketService.subscribe("/topic/"+instance().gameId+"/start");
-        websocketService.subscribe("/topic/"+instance().gameId+"/update");
+        websocketService.subscribe("/topic/" + gameId + "/start");
+        websocketService.subscribe("/topic/" + gameId + "/update");
 
         var registerForGame = new RegisterForGame();
         Game.service().sendRegisterForGame(this.gameId, registerForGame);
+    }
+
+    public void subscribeToPositionUpdates() {
+        websocketService.subscribe("/topic/games/" + gameId + "/position-updated");
     }
 
     public void setWebsocketService(WebsocketService websocketService) {

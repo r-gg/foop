@@ -1,10 +1,7 @@
 package foop.a1.client.service;
 
 import foop.a1.client.messages.Message;
-import foop.a1.client.messages.response.AllGames;
-import foop.a1.client.messages.response.RegistrationResult;
-import foop.a1.client.messages.response.SingleGame;
-import foop.a1.client.messages.response.GameStarted;
+import foop.a1.client.messages.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +28,7 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
     private Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final HashMap<String, Type> destination2responseType = new HashMap<>(){{
-        put("/topic/games/create", SingleGame.class);
+        put("/topic/games/create", GameCreated.class);
         put("/topic/games", AllGames.class);
         put("/user/queue/register", RegistrationResult.class);
     }};
@@ -47,6 +44,8 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
         LOGGER.info("Determining payload type for '{}'", destination);
         if(destination.endsWith("/start")){
             return GameStarted.class;
+        } else if (destination.endsWith("/position-updated")) {
+            return PositionUpdated.class;
         }
         return destination2responseType.get(destination);
     }
