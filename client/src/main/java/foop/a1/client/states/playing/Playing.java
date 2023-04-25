@@ -43,14 +43,14 @@ public class Playing extends State {
     @Override
     public void update() {
         if (player != null) {
-            var oldX = player.getX();
-            var oldY = player.getY();
+            var oldX = player.getPosition().getX();
+            var oldY = player.getPosition().getY();
             player.update();
-            if (oldX != player.getX() || oldY != player.getY()) {
+            if (!oldX.equals(player.getPosition().getX()) || !oldY.equals(player.getPosition().getY())) {
                 // position changed, send to the server
                 UpdatePosition updatePositionReq = new UpdatePosition();
                 updatePositionReq.setGameId(Game.instance().getGameId());
-                updatePositionReq.setNewPosition(new PositionDTO(player.getX(), player.getY()));
+                updatePositionReq.setNewPosition(new PositionDTO(player.getPosition().getX(), player.getPosition().getY()));
                 Game.service().sendUpdatePosition(updatePositionReq);
             }
         }
@@ -86,6 +86,10 @@ public class Playing extends State {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public List<Enemy> getEnemies() {

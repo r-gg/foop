@@ -2,18 +2,15 @@ package foop.a1.client.states.playing.entities;
 
 public abstract class Entity {
     protected String id;
-    protected int x;
-    protected int y;
+    protected Position position;
 
-    public Entity(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public Entity(Position position) {
+        this.position = position;
     }
 
-    public Entity(String id, int x, int y) {
+    public Entity(String id, Position position) {
         this.id = id;
-        this.x = x;
-        this.y = y;
+        this.position = position;
     }
 
     public String getId() {
@@ -24,20 +21,11 @@ public abstract class Entity {
         this.id = id;
     }
 
-    public int getX() {
-        return x;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public void setPosition(Position position) {
+        this.position = position;
     }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
 }

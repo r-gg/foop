@@ -9,8 +9,8 @@ import java.io.InputStream;
 public class SubwayEntrance extends Entity {
     private BufferedImage backgroundImg;
 
-    public SubwayEntrance(int x, int y) {
-        super(x, y);
+    public SubwayEntrance(Position position) {
+        super(position);
         loadImage();
     }
 
@@ -23,7 +23,7 @@ public class SubwayEntrance extends Entity {
     }
 
     public void render(Graphics g) {
-        g.drawImage(backgroundImg, x, y, 40, 40, null);
+        g.drawImage(backgroundImg, position.getX(), position.getY(), 40, 40, null);
     }
 }
 

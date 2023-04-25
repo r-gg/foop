@@ -46,6 +46,8 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
             return GameStarted.class;
         } else if (destination.endsWith("/position-updated")) {
             return PositionUpdated.class;
+        } else if (destination.endsWith("/enemies-positions-updated")) {
+            return EnemiesPositionsUpdated.class;
         }
         return destination2responseType.get(destination);
     }

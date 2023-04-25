@@ -7,9 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Game implements Runnable {
@@ -19,6 +18,7 @@ public class Game implements Runnable {
     private final List<Mouse> mice = new ArrayList<>();
     private GameBoard board;
     private GameStatus status;
+    private Function<Void, Void> onMicePositionsUpdate = null;
 
     public Game() {
         gameId = UUID.randomUUID().toString();
@@ -26,15 +26,19 @@ public class Game implements Runnable {
 
         // test mice
         var mouse1 = new Mouse();
+        mouse1.setId(UUID.randomUUID().toString());
         mouse1.setPosition(new Position(50, 300));
         this.mice.add(mouse1);
         var mouse2 = new Mouse();
+        mouse2.setId(UUID.randomUUID().toString());
         mouse2.setPosition(new Position(10, 100));
         this.mice.add(mouse2);
         var mouse3 = new Mouse();
+        mouse3.setId(UUID.randomUUID().toString());
         mouse3.setPosition(new Position(20, 250));
         this.mice.add(mouse3);
         var mouse4 = new Mouse();
+        mouse4.setId(UUID.randomUUID().toString());
         mouse4.setPosition(new Position(170, 220));
         this.mice.add(mouse4);
     }
@@ -47,8 +51,6 @@ public class Game implements Runnable {
 
         players.add(player);
         logger.info("Added player: {}", player.getPlayerId());
-
-        //TODO if players size >= 4, status to ALL_READY and start
     }
 
     public void removePlayer(Player player){
@@ -66,16 +68,14 @@ public class Game implements Runnable {
     public void run() {
         long startMillis = System.currentTimeMillis();
         while (true) {
-            // send request
-
-            // wait for responses (with timeout)
-
-            // update locations
-
             // move mice
+            // just test movement to test communication
+            mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 1, mice.get(0).getPosition().y()));
 
-            // send updated locations back -- redraw
-
+            // send updated locations back
+            if (this.onMicePositionsUpdate != null) {
+                this.onMicePositionsUpdate.apply(null);
+            }
 
             try {
                 Thread.sleep(Duration.ofMillis(Constants.GAME_LOOP_DELAY_MILLIS));
@@ -117,5 +117,20 @@ public class Game implements Runnable {
 
     public List<Position> getCatLocations() {
         return players.stream().map(Player::getPosition).collect(Collectors.toList());
+    }
+
+    public void setOnMicePositionsUpdate(Function<Void, Void> onMicePositionsUpdate) {
+        this.onMicePositionsUpdate = onMicePositionsUpdate;
+    }
+
+    public Map<String, Position> getMicePositions() {
+        var result = new HashMap<String, Position>();
+        for (var mouse : mice) {
+            // return only above ground to avoid cheating on client side
+            if (mouse.isAboveGround()) {
+                result.put(mouse.getId(), mouse.getPosition());
+            }
+        }
+        return result;
     }
 }

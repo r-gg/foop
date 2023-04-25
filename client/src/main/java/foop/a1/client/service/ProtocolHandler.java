@@ -9,6 +9,7 @@ import foop.a1.client.states.menu.Menu;
 import foop.a1.client.states.playing.Playing;
 import foop.a1.client.states.playing.entities.Enemy;
 import foop.a1.client.states.playing.entities.Player;
+import foop.a1.client.states.playing.entities.Position;
 import foop.a1.client.states.playing.entities.SubwayEntrance;
 import foop.a1.client.states.waiting.Waiting;
 import org.slf4j.Logger;
@@ -41,6 +42,8 @@ public class ProtocolHandler {
             handleResponse((GameStarted) response);
         } else if (response instanceof PositionUpdated) {
             handleResponse((PositionUpdated) response);
+        } else if (response instanceof EnemiesPositionsUpdated) {
+            handleResponse((EnemiesPositionsUpdated) response);
         } else {
             throw new ProtocolException("Response from server does not have any of the provided types");
         }
@@ -68,9 +71,9 @@ public class ProtocolHandler {
         if(registrationResult.isSuccessful()){
             LOGGER.info("Registration successful");
             var playerDto = registrationResult.getPlayer();
-            var player = new Player(playerDto.getPlayerId(), playerDto.getPosition().getX(), playerDto.getPosition().getY());
+            var player = new Player(playerDto.getPlayerId(), new Position(playerDto.getPosition().getX(), playerDto.getPosition().getY()));
             Game.instance().setCurrentPlayer(player);
-        }else {
+        } else {
             LOGGER.error("Registration failed");
         }
     }
@@ -83,18 +86,17 @@ public class ProtocolHandler {
         Playing playing = new Playing();
         playing.setPlayer(Game.instance().getCurrentPlayer());
         var players = gameStarted.getGameBoardDTO().getPlayers().stream().filter(p -> !p.getPlayerId().equals(Game.instance().getCurrentPlayer().getId()))
-                        .map(playerDTO -> new Player(playerDTO.getPlayerId(), playerDTO.getPosition().getX(),playerDTO.getPosition().getY()))
+                        .map(playerDTO -> new Player(playerDTO.getPlayerId(), new Position(playerDTO.getPosition().getX(),playerDTO.getPosition().getY())))
                                 .toList();
         playing.setPlayers(players);
 
-        // TODO: behavior type
-        var enemies = gameStarted.getGameBoardDTO().getMice().stream().map(mouseDTO -> new Enemy(mouseDTO.getPosition().getX(), mouseDTO.getPosition().getY(), 0)).toList();
+        var enemies = gameStarted.getGameBoardDTO().getMice().stream().map(mouseDTO -> new Enemy(mouseDTO.getId(), new Position(mouseDTO.getPosition().getX(), mouseDTO.getPosition().getY()))).toList();
         playing.setEnemies(enemies);
 
         List<SubwayEntrance> entrances = new ArrayList<>();
         for (var subway : gameStarted.getGameBoardDTO().getSubways()) {
             for (var en : subway.getEntrances()) {
-                entrances.add(new SubwayEntrance(en.getX(), en.getY()));
+                entrances.add(new SubwayEntrance(new Position(en.getX(), en.getY())));
             }
         }
         playing.setSubwayEntrances(entrances);
@@ -102,7 +104,34 @@ public class ProtocolHandler {
         Game.instance().nextState(playing);
     }
 
-    private void handleResponse(PositionUpdated positionUpdated){
-        // TODO
+    private void handleResponse(PositionUpdated positionUpdated) {
+        State currentState = Game.instance().getState();
+        if (!(currentState instanceof Playing)) {
+            this.LOGGER.error("Player position can be updated only in playing state");
+            return;
+        }
+        var player = ((Playing) currentState).getPlayers().stream().filter(p -> positionUpdated.getPlayerId().equals(p.getId()))
+                .findAny()
+                .orElse(null);
+        if (player != null) {
+            player.setPosition(new Position(positionUpdated.getNewPosition().getX(), positionUpdated.getNewPosition().getY()));
+        } else if (!positionUpdated.getPlayerId().equals(((Playing) currentState).getPlayer().getId())) {
+            this.LOGGER.error("Position updated: player " + positionUpdated.getPlayerId() + " not found");
+        }
+    }
+
+    private void handleResponse(EnemiesPositionsUpdated positionsUpdated) {
+        State currentState = Game.instance().getState();
+        if (!(currentState instanceof Playing)) {
+            this.LOGGER.error("Enemies positions can be updated only in playing state");
+            return;
+        }
+
+        var newPositionsById = positionsUpdated.getNewPositionsById();
+        List<Enemy> newEnemies = new ArrayList<>();
+        for (var newPosId : newPositionsById.keySet()) {
+            newEnemies.add(new Enemy(newPosId, new Position(newPositionsById.get(newPosId).getX(), newPositionsById.get(newPosId).getY())));
+        }
+        ((Playing) currentState).setEnemies(newEnemies);
     }
 }

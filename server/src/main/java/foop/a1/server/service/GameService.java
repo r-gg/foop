@@ -5,6 +5,7 @@ import foop.a1.server.entities.Game;
 import foop.a1.server.entities.GameBoard;
 import foop.a1.server.entities.Player;
 import foop.a1.server.entities.Position;
+import foop.a1.server.messages.response.EnemiesPositionsUpdated;
 import foop.a1.server.messages.response.GameStarted;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GameService {
@@ -33,6 +35,17 @@ public class GameService {
         var game = new Game() {{
             setBoard(new GameBoard(200, 200));
         }};
+        game.setOnMicePositionsUpdate((Void) -> {
+            var msg = new EnemiesPositionsUpdated();
+            var positions = game.getMicePositions();
+            var mappedPositions = positions.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> new PositionDTO(e.getValue().x(), e.getValue().y())));
+            msg.setNewPositionsById(mappedPositions);
+
+            this.simpMessagingTemplate.convertAndSend("/topic/games/"+game.getGameId()+"/enemies-positions-updated", msg);
+            return null;
+        });
         games.add(game);
         return game.getGameId();
     }
@@ -89,7 +102,7 @@ public class GameService {
         var subwaysDtos = game.getBoard().getSubways()
                 .stream().map(subway -> new SubwayDTO(
                         Arrays.stream(subway.getEntrances()).map(position -> new PositionDTO(position.x(), position.y())).toList(),
-                        subway.getMice().stream().map(mouse -> new MouseDTO(new PositionDTO(mouse.getPosition().x(), mouse.getPosition().y()))).toList()
+                        subway.getMice().stream().map(mouse -> new MouseDTO(mouse.getId(), new PositionDTO(mouse.getPosition().x(), mouse.getPosition().y()))).toList()
                 )).toList();
 
         var playersDtos = game.getPlayers().stream()
@@ -98,7 +111,7 @@ public class GameService {
                 .toList();
 
         var miceDtos = game.getMice().stream()
-                .map(mouse -> new MouseDTO(new PositionDTO(mouse.getPosition().x(), mouse.getPosition().y())))
+                .map(mouse -> new MouseDTO(mouse.getId(), new PositionDTO(mouse.getPosition().x(), mouse.getPosition().y())))
                 .toList();
 
         var gameBoardDto = new GameBoardDTO(game.getBoard().getRoot(),

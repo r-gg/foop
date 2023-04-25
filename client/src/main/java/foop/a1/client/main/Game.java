@@ -125,6 +125,7 @@ public class Game implements Runnable {
 
     public void subscribeToPositionUpdates() {
         websocketService.subscribe("/topic/games/" + gameId + "/position-updated");
+        websocketService.subscribe("/topic/games/" + gameId + "/enemies-positions-updated");
     }
 
     public void setWebsocketService(WebsocketService websocketService) {
