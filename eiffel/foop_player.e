@@ -10,6 +10,13 @@ class
 inherit
 	EV_MODEL_MOVE_HANDLE
 
+	FOOP_CONSTANTS
+		export
+			{NONE} all
+		undefine
+			default_create, copy
+		end
+
 create
 	list_make,
 	make_with_pixmap
@@ -22,48 +29,12 @@ feature {NONE} -- Initialization
 			l_hex: EV_MODEL_PICTURE
 		do
 			default_create
+
 			create l_hex.make_with_pixmap (i_pixmap)
 			extend (l_hex)
 			l_hex.set_point_position (0, 0)
 
-			enable_move
-			enable_events_sended_to_group
-		end
-
-feature {NONE} -- Move features
-
-	on_pointer_motion_on_world (ax, ay: INTEGER; x_tilt, y_tilt, pressure: DOUBLE; a_screen_x, a_screen_y: INTEGER)
-			-- move player with pointer
-		do
-			if has_capture then
-				print ("Dragged tile view: (" + ax.out + "," + ay.out + ")%N")
-				set_point_position (ax, ay)
-			end
-		end
-
-	on_pointer_button_press_on_world (ax, ay, button: INTEGER; x_tilt, y_tilt, pressure: DOUBLE; a_screen_x, a_screen_y: INTEGER)
-			-- enable capture on button press
-		do
-			enable_capture
-		end
-
-	on_pointer_button_release_on_world (ax, ay, button: INTEGER; x_tilt, y_tilt, pressure: DOUBLE; a_screen_x, a_screen_y: INTEGER)
-			-- release capture on button release
-		do
-			if has_capture then
-				disable_capture
-			end
-		end
-
-feature {NONE} -- Status setting
-
-	enable_move
-			-- enable movement of the player
-		do
-			pointer_motion_actions.extend (agent on_pointer_motion_on_world)
-			pointer_button_press_actions.extend (agent on_pointer_button_press_on_world)
-			pointer_button_release_actions.extend (agent on_pointer_button_release_on_world)
+			set_point_position (0, 0)
 		end
 
 end
-

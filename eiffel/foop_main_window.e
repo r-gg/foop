@@ -10,7 +10,7 @@ class
 inherit
 	EV_TITLED_WINDOW
 		redefine
-			create_interface_objects,
+			create_implementation,
 			initialize,
 			is_in_default_state
 		end
@@ -26,17 +26,8 @@ create
 	default_create
 
 feature {NONE} -- Initialization
-
-	create_interface_objects
-			-- <Precursor>
-		do
-			create standard_menu_bar
-			create game_menu.make_with_text (Menu_game_item)
-			create help_menu.make_with_text (Menu_help_item)
-		end
-
-	initialize
-			-- Build the interface for this window.
+	create_implementation
+			-- Create Implementation.
 		do
 			Precursor {EV_TITLED_WINDOW}
 
@@ -45,12 +36,18 @@ feature {NONE} -- Initialization
 
 			build_main_container
 			extend (main_container)
+		end
 
-			request_new_game
+	initialize
+			-- Initialize window.
+		do
+			Precursor {EV_TITLED_WINDOW}
 
-				-- Execute `request_close_window' when the user clicks
-				-- on the cross in the title bar.
+				-- Set actions for menu items.
 			close_request_actions.extend (agent request_close_window)
+			new_game_menu_item.select_actions.extend (agent request_new_game)
+			close_menu_item.select_actions.extend (agent request_close_window)
+			about_menu_item.select_actions.extend (agent request_about)
 
 				-- Set the title of the window.
 			set_title (Window_title)
@@ -61,7 +58,6 @@ feature {NONE} -- Initialization
 
 	is_in_default_state: BOOLEAN
 			-- Is the window in its default state?
-			-- (as stated in `initialize')
 		do
 			Result := (width = Window_width) and then
 				(height = Window_height) and then
@@ -76,12 +72,23 @@ feature {NONE} -- Menu Implementation
 	game_menu: EV_MENU
 			-- "game" menu for this window (contains New, Open, Close, Exit...)
 
+	new_game_menu_item: EV_MENU_ITEM
+			-- "new game" menu item
+
+	close_menu_item: EV_MENU_ITEM
+			-- "close" menu item
+
+	about_menu_item: EV_MENU_ITEM
+			-- "about" menu item
+
 	help_menu: EV_MENU
 			-- "Help" menu for this window (contains About...)
 
 	build_standard_menu_bar
 			-- Create and populate `standard_menu_bar'.
 		do
+			create standard_menu_bar
+
 				-- Add the "game" menu.
 			build_game_menu
 			standard_menu_bar.extend (game_menu)
@@ -89,61 +96,35 @@ feature {NONE} -- Menu Implementation
 			build_help_menu
 			standard_menu_bar.extend (help_menu)
 		ensure
-			menu_bar_initialized: not standard_menu_bar.is_empty
+			menu_bar_initialized: standard_menu_bar /= Void
 		end
 
 	build_game_menu
 			-- Create and populate `game_menu'.
-		local
-			menu_item: EV_MENU_ITEM
 		do
-			create menu_item.make_with_text (Menu_game_new_item)
-			menu_item.select_actions.extend (agent request_new_game)
-			game_menu.extend (menu_item)
+			create game_menu.make_with_text (Menu_game_item)
 
-				-- Create the game/Exit menu item and make it call
-				-- `request_close_window' when it is selected.
-			create menu_item.make_with_text (Menu_game_exit_item)
-			menu_item.select_actions.extend (agent request_close_window)
-			game_menu.extend (menu_item)
+			create new_game_menu_item.make_with_text (Menu_game_new_item)
+			game_menu.extend (new_game_menu_item)
+
+			create close_menu_item.make_with_text (Menu_game_exit_item)
+			game_menu.extend (close_menu_item)
 		ensure
-			game_menu_initialized: not game_menu.is_empty
+			game_menu_initialized: game_menu /= Void and new_game_menu_item /= Void and close_menu_item /= Void
 		end
 
 	build_help_menu
 			-- Create and populate `help_menu'.
-		local
-			menu_item: EV_MENU_ITEM
 		do
-			create menu_item.make_with_text (Menu_help_about_item)
-			menu_item.select_actions.extend (agent on_about)
-			help_menu.extend (menu_item)
+			create help_menu.make_with_text (Menu_help_item)
+
+			create about_menu_item.make_with_text (Menu_help_about_item)
+			help_menu.extend (about_menu_item)
 
 		ensure
-			help_menu_initialized: not help_menu.is_empty
+			help_menu_initialized: help_menu /= Void and about_menu_item /= Void
 		end
 
-feature {NONE} -- About Dialog Implementation
-
-	on_about
-			-- Display the About dialog.
-		local
-			about_dialog: FOOP_ABOUT_DIALOG
-		do
-			create about_dialog
-			about_dialog.show_modal_to_window (Current)
-		end
-
-feature {NONE} -- Implementation / Constants
-
-	Window_title: STRING = "foop"
-			-- Title of the window.
-
-	Window_width: INTEGER = 2800
-			-- Initial width for this window.
-
-	Window_height: INTEGER = 1880
-			-- Initial height for this window.
 feature {NONE} -- Implementation / Attributes
 
 	main_container: EV_VERTICAL_BOX
@@ -160,13 +141,10 @@ feature {NONE} -- Implementation / Attributes
 
 	projector: EV_MODEL_DRAWING_AREA_PROJECTOR
 			-- projector
-
 feature {NONE} -- Implementation
 
 	build_main_container
 			-- Create and populate `main_container'.
-		require
-			main_container_not_yet_created: main_container = Void
 		local
 			l_bg: EV_PIXMAP
 			l_bg_pic: EV_MODEL_PICTURE
@@ -194,7 +172,7 @@ feature {NONE} -- Implementation
 				-- Refresh the drawing area
 			projector.project
 		ensure
-			main_container_created: main_container /= Void
+			main_container_created: main_container /= Void and world /= Void and area /= Void and buffer /= Void and projector /= Void
 		end
 
 feature {NONE} -- Events
@@ -239,6 +217,15 @@ feature {NONE} -- Events
 			l_pixmap_entrance.set_with_named_file (file_system.pathname_to_string (img_entrance))
 
 			create l_game.make (world, projector, l_pixmap_cat, l_pixmap_mouse, l_pixmap_entrance)
+		end
+
+	request_about
+			-- Display the About dialog.
+		local
+			about_dialog: FOOP_ABOUT_DIALOG
+		do
+			create about_dialog
+			about_dialog.show_modal_to_window (Current)
 		end
 
 end

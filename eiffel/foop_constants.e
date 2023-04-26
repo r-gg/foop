@@ -20,6 +20,15 @@ inherit
 
 feature -- Access
 
+	Window_title: STRING = "foop"
+			-- Title of the window.
+
+	Window_width: INTEGER = 1000
+			-- Initial width for this window.
+
+	Window_height: INTEGER = 1000
+			-- Initial height for this window.
+
 	Image_folder: STRING = "static"
 
 	img_path: KL_PATHNAME

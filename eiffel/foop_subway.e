@@ -15,9 +15,11 @@ feature {NONE} -- Initialization
 	make
 		-- create a subway with 2 entrances
 		local
-			entrance: FOOP_ENTRANCE
+			l_entrance: FOOP_ENTRANCE
+			l_entrances: LINKED_LIST[FOOP_ENTRANCE]
 		do
-			
+			create l_entrances.make
+			entrances := l_entrances
 		end
 
 
