@@ -8,20 +8,14 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class Player extends Entity {
-    private BufferedImage animation;
+    private static BufferedImage animation;
     private boolean left, up, right, down;
 
-    public Player() {
-        super(0, 0);
-        loadAnimation();
-    }
-
-    public Player(int x, int y) {
-        super(x, y);
-    }
-
-    public Player(String id, int x, int y) {
-        super(id, x, y);
+    public Player(String id, Position position) {
+        super(id, position);
+        if (animation == null) {
+            animation = loadAnimation();
+        }
     }
 
     public void update() {
@@ -29,33 +23,34 @@ public class Player extends Entity {
     }
 
     public void render(Graphics g) {
-        g.drawImage(animation, x, y, 256, 160, null);
+        g.drawImage(animation, position.getX(), position.getY(), 256, 160, null);
     }
 
     private void updatePos() {
-        float playerSpeed = 2.0f;
+        Integer playerSpeed = 2;
         if (left && !right) {
-            x -= playerSpeed;
+            position.setX(position.getX() - playerSpeed);
         } else if (right && !left) {
-            x += playerSpeed;
+            position.setX(position.getX() + playerSpeed);
         }
 
         if (up && !down) {
-            y -= playerSpeed;
+            position.setY(position.getY() - playerSpeed);
         } else if (down && !up) {
-            y += playerSpeed;
+            position.setY(position.getY() + playerSpeed);
         }
     }
 
-    private void loadAnimation() {
+    private BufferedImage loadAnimation() {
         try (InputStream is = getClass().getResourceAsStream("/static/cat.png")) {
             BufferedImage img = ImageIO.read(is);
 
-            animation = img.getSubimage(50, 50, 50, 50);
+            return img.getSubimage(50, 50, 50, 50);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public void setLeft(boolean left) {

@@ -1,17 +1,22 @@
 package foop.a1.client.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.data.util.Pair;
 
 import java.util.List;
 
 public class GameBoardDTO {
+    @JsonDeserialize(using = IntegerPairDeserializer.class)
     private Pair<Integer, Integer> root;
+    @JsonDeserialize(using = IntegerPairDeserializer.class)
     private Pair<Integer, Integer> dimensions;
     private List<SubwayDTO> subways;
 
     private List<PlayerDTO> players;
 
     private List<MouseDTO> mice;
+
+    public GameBoardDTO() {}
 
     public GameBoardDTO(Pair<Integer, Integer> root, Pair<Integer, Integer> dimensions, List<SubwayDTO> subways, List<PlayerDTO> players, List<MouseDTO> mice) {
         this.root = root;

@@ -2,13 +2,17 @@ package foop.a1.server.entities;
 
 import org.springframework.data.util.Pair;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GameBoard {
     private Pair<Integer, Integer> root;
     private Pair<Integer, Integer> dimensions;
-    private List<Subway> subways = new ArrayList<>();
+    private List<Subway> subways = Arrays.asList(
+            new Subway(Arrays.asList(new Position(120, 120),new Position(20, 40))),
+            new Subway(Arrays.asList(new Position(180, 180),new Position(300, 350))),
+            new Subway(Arrays.asList(new Position(230, 270),new Position(100, 150)))
+    );
 
     public GameBoard(int width, int height) {
         root = Pair.of(0, 0);

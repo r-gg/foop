@@ -9,20 +9,21 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Function;
 
 public class MenuButton {
     private final int xPos;
     private final int yPos;
     private final int rowIndex;
-    private final State nextState;
+    private final Function<Void, Void> _onClick;
     private BufferedImage[] images;
     private Rectangle bounds;
 
-    public MenuButton(int xPos, int yPos, int rowIndex, State nextState) {
+    public MenuButton(int xPos, int yPos, int rowIndex, Function<Void, Void> onClick) {
         this.xPos = xPos;
         this.yPos = yPos;
         this.rowIndex = rowIndex;
-        this.nextState = nextState;
+        this._onClick = onClick;
 
         loadImg();
         initBounds();
@@ -50,7 +51,7 @@ public class MenuButton {
         return bounds;
     }
 
-    public void applyNextState() {
-        Game.instance().nextState(nextState);
+    public void onClick() {
+        this._onClick.apply(null);
     }
 }

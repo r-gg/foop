@@ -1,9 +1,9 @@
 package foop.a1.client.states.menu;
 
+import foop.a1.client.messages.request.CreateGame;
 import foop.a1.client.states.quit.Quit;
 import foop.a1.client.states.State;
 import foop.a1.client.main.Game;
-import foop.a1.client.states.waiting.Waiting;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,8 +22,17 @@ public class Menu extends State {
     }
 
     private void loadButtons() {
-        buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 50, 0, new Waiting());
-        buttons[1] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 150, 1, new Quit());
+        buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 50, 0, (Void v) -> {
+            // create game button
+            var createGame = new CreateGame();
+            Game.service().sendGameCreate(createGame);
+            return null;
+        });
+        buttons[1] = new MenuButton(Game.GAME_WIDTH / 2 - 100, 150, 1, (Void v) -> {
+            // quit button
+            this.applyNextState(new Quit());
+            return null;
+        });
     }
 
     private void loadBackground() {
@@ -46,9 +55,13 @@ public class Menu extends State {
     public void mouseClicked(MouseEvent e) {
         for (MenuButton mb : buttons) {
             if (isIn(e, mb)) {
-                mb.applyNextState();
+                mb.onClick();
                 break;
             }
         }
+    }
+
+    void applyNextState(State state) {
+        Game.instance().nextState(state);
     }
 }

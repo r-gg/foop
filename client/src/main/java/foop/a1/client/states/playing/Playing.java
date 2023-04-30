@@ -1,5 +1,8 @@
 package foop.a1.client.states.playing;
 
+import foop.a1.client.dto.PositionDTO;
+import foop.a1.client.main.Game;
+import foop.a1.client.messages.request.UpdatePosition;
 import foop.a1.client.states.playing.entities.Enemy;
 import foop.a1.client.states.playing.entities.Player;
 import foop.a1.client.states.State;
@@ -11,29 +14,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Playing extends State {
-    private final Player player;
+    private Player player;
     private List<Player> players = new ArrayList<>();
-    private final Enemy[] enemies = { // mice
-            new Enemy(50, 300, 0),
-            new Enemy(10, 100, 0),
-            new Enemy(20, 250, 0),
-            new Enemy(170, 220, 0),
-    };
-    private final SubwayEntrance[] subwayEntrances = {
-            new SubwayEntrance(120, 120),
-            new SubwayEntrance(20, 40),
-            new SubwayEntrance(180, 180),
-            new SubwayEntrance(300, 350),
-            new SubwayEntrance(230, 270),
-    };
+    private List<Enemy> enemies = new ArrayList<>();
+
+    private List<SubwayEntrance> subwayEntrances = new ArrayList<>();
 
     public Playing() {
-        player = new Player();
+        Game.instance().subscribeToPositionUpdates(); // TODO: unsubscribe
+        Game.instance().subscribeToGameOver();
     }
 
     @Override
     public void draw(Graphics g) {
-        player.render(g);
+        if (player != null) {
+            player.render(g);
+        }
 
         for (var player : players)
             player.render(g);
@@ -47,7 +43,18 @@ public class Playing extends State {
 
     @Override
     public void update() {
-        player.update();
+        if (player != null) {
+            var oldX = player.getPosition().getX();
+            var oldY = player.getPosition().getY();
+            player.update();
+            if (!oldX.equals(player.getPosition().getX()) || !oldY.equals(player.getPosition().getY())) {
+                // position changed, send to the server
+                UpdatePosition updatePositionReq = new UpdatePosition();
+                updatePositionReq.setGameId(Game.instance().getGameId());
+                updatePositionReq.setNewPosition(new PositionDTO(player.getPosition().getX(), player.getPosition().getY()));
+                Game.service().sendUpdatePosition(updatePositionReq);
+            }
+        }
     }
 
     @Override
@@ -78,11 +85,27 @@ public class Playing extends State {
         this.players = players;
     }
 
-    public Enemy[] getEnemies() {
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public List<Enemy> getEnemies() {
         return enemies;
     }
 
-    public SubwayEntrance[] getSubwayEntrances() {
+    public void setEnemies(List<Enemy> enemies) {
+        this.enemies = enemies;
+    }
+
+    public List<SubwayEntrance> getSubwayEntrances() {
         return subwayEntrances;
+    }
+
+    public void setSubwayEntrances(List<SubwayEntrance> subwayEntrances) {
+        this.subwayEntrances = subwayEntrances;
     }
 }

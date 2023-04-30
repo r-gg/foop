@@ -4,7 +4,7 @@ import foop.a1.server.dto.GameDTO;
 import foop.a1.server.messages.request.GetGames;
 import foop.a1.server.messages.response.AllGames;
 import foop.a1.server.messages.request.CreateGame;
-import foop.a1.server.messages.response.SingleGame;
+import foop.a1.server.messages.response.GameCreated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -114,7 +114,7 @@ public class GetGamesTest {
         var futureSession = stompClient.connectAsync(URL, new StompSessionHandlerAdapter() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return SingleGame.class;
+                return GameCreated.class;
             }
         });
 

@@ -7,24 +7,25 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Enemy extends Entity {
-    protected int behaviorType;
-    private BufferedImage img;
+    private static BufferedImage img;
 
-    public Enemy(int x, int y, int behaviorType) {
-        super(x, y);
-        this.behaviorType = behaviorType;
-        this.loadImage();
+    public Enemy(String id, Position position) {
+        super(id, position);
+        if (img == null) { // avoid reloading on each instantiation
+            img = this.loadImage();
+        }
     }
 
     public void render(Graphics g) {
-        g.drawImage(img, x, y, 50, 30, null);
+        g.drawImage(img, position.getX(), position.getY(), 50, 30, null);
     }
 
-    private void loadImage() {
+    private BufferedImage loadImage() {
         try (InputStream is = getClass().getResourceAsStream("/static/mouse.png")) {
-            this.img = ImageIO.read(is);
+            return ImageIO.read(is);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }

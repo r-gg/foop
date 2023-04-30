@@ -1,15 +1,11 @@
 package foop.a1.client.service;
 
-import foop.a1.client.main.Game;
 import foop.a1.client.messages.Message;
-import foop.a1.client.messages.response.AllGames;
-import foop.a1.client.messages.response.RegistrationResult;
-import foop.a1.client.messages.response.SingleGame;
-import foop.a1.client.messages.response.StartGame;
-import org.hibernate.sql.ast.tree.expression.Star;
+import foop.a1.client.messages.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
@@ -32,9 +28,9 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
     private Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final HashMap<String, Type> destination2responseType = new HashMap<>(){{
-        put("/topic/games/create", SingleGame.class);
+        put("/topic/games/create", GameCreated.class);
         put("/topic/games", AllGames.class);
-        put("/topic/register", RegistrationResult.class);
+        put("/user/queue/register", RegistrationResult.class);
     }};
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
@@ -42,13 +38,18 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
         super.afterConnected(session, connectedHeaders);
     }
 
-
     @Override
     public Type getPayloadType(StompHeaders headers) {
         String destination = headers.getDestination();
         LOGGER.info("Determining payload type for '{}'", destination);
         if(destination.endsWith("/start")){
-            return StartGame.class;
+            return GameStarted.class;
+        } else if (destination.endsWith("/position-updated")) {
+            return PositionUpdated.class;
+        } else if (destination.endsWith("/enemies-positions-updated")) {
+            return EnemiesPositionsUpdated.class;
+        } else if (destination.endsWith("/over")) {
+            return GameOver.class;
         }
         return destination2responseType.get(destination);
     }
@@ -63,5 +64,11 @@ public class MyStompSessionHandler extends StompSessionHandlerAdapter {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+        LOGGER.error(exception.toString());
+        super.handleException(session, command, headers, payload, exception);
     }
 }

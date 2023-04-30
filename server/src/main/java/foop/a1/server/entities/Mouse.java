@@ -3,6 +3,7 @@ package foop.a1.server.entities;
 import java.util.List;
 
 public class Mouse implements Runnable {
+    private String id;
     private Position position;
 
     public void setPosition(Position position) {
@@ -13,8 +14,16 @@ public class Mouse implements Runnable {
         return this.position;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public boolean isAboveGround() {
-        return false;
+        return true; // TODO
     }
 
     public void inform(Game game) {
@@ -22,7 +31,7 @@ public class Mouse implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void run() { // is thread per mouse really needed? Is it not enough just to update on interval?
         // run, eat cheese
         // squeak
     }

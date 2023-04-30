@@ -1,10 +1,11 @@
 package foop.a1.client.main;
 
+import foop.a1.client.messages.request.RegisterForGame;
 import foop.a1.client.service.WebsocketService;
 import foop.a1.client.states.State;
 import foop.a1.client.states.menu.Menu;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import foop.a1.client.states.playing.entities.Player;
+import org.springframework.messaging.simp.stomp.StompSession;
 
 import java.awt.Graphics;
 
@@ -23,6 +24,8 @@ public class Game implements Runnable {
     private static final Object mutex = new Object();
     private String gameId;
     private State state;
+    private StompSession.Subscription createGameSubscription;
+    private Player currentPlayer;
 
     private Game() {
         gamePanel = new GamePanel();
@@ -109,17 +112,34 @@ public class Game implements Runnable {
 
     public void nextState(State state) {
         this.state = state;
-        // TODO: Maybe redraw here because it is called from the SingleGame.class
     }
 
     public void subscribeToGame(){
-        websocketService.subscribe("/topic/"+instance().gameId+"/register");
-        websocketService.subscribe("/topic/"+instance().gameId+"/start");
-        websocketService.subscribe("/topic/"+instance().gameId+"/update");
+        websocketService.subscribe("/user/queue/register");
+        websocketService.subscribe("/topic/" + gameId + "/start");
+        websocketService.subscribe("/topic/" + gameId + "/update");
+
+        var registerForGame = new RegisterForGame();
+        Game.service().sendRegisterForGame(this.gameId, registerForGame);
     }
 
-    public static void setWebsocketService(WebsocketService websocketService) {
+    public void subscribeToPositionUpdates() {
+        websocketService.subscribe("/topic/games/" + gameId + "/position-updated");
+        websocketService.subscribe("/topic/games/" + gameId + "/enemies-positions-updated");
+    }
+
+    public void subscribeToGameOver() {
+        websocketService.subscribe("/topic/games/" + gameId + "/over");
+    }
+
+    public void setWebsocketService(WebsocketService websocketService) {
         Game.websocketService = websocketService;
+        createGameSubscription = websocketService.subscribe("/topic/games/create");
+//        websocketService.subscribe("/topic/games");
+    }
+
+    public static WebsocketService service() {
+        return websocketService;
     }
 
     public String getGameId() {
@@ -128,5 +148,13 @@ public class Game implements Runnable {
 
     public void setGameId(String gameId) {
         this.gameId = gameId;
+    }
+
+    public void setCurrentPlayer(Player player) {
+        this.currentPlayer = player;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 }
