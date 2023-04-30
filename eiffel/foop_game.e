@@ -29,7 +29,7 @@ feature {NONE} -- Initialization
 			goal_x := 500
 			goal_y := 500
 
-			build_subways (i_img_entrance)
+			spawn_subways (i_img_entrance)
 			spawn_player (i_img_cat)
 			spawn_mice (i_img_mouse)
 
@@ -70,11 +70,43 @@ feature {NONE} -- Attributes
 			-- y coordinate of goal
 feature {NONE} -- Implementation
 
-	build_subways (i_img_entrance: EV_PIXMAP)
-			-- build subways
+	spawn_subways (i_img_entrance: EV_PIXMAP)
+			-- spawn subways
+		local
+			l_subway: FOOP_SUBWAY
+			l_cnt: INTEGER
+			l_x_1: INTEGER
+			l_y_1: INTEGER
+			l_x_2: INTEGER
+			l_y_2: INTEGER
 		do
-				-- TODO
 			create {LINKED_LIST [FOOP_SUBWAY]} subways.make
+
+			from
+				l_cnt := 0
+			until
+				l_cnt = 4
+			loop
+				random.forth
+				l_x_1 := random.item \\ window_width
+
+				random.forth
+				l_y_1 := random.item \\ window_height
+
+				random.forth
+				l_x_2 := random.item \\ window_width
+
+				random.forth
+				l_y_2 := random.item \\ window_height
+
+				create l_subway.make_with_pixmap (l_x_1, l_y_1, l_x_2, l_y_2, i_img_entrance)
+
+				subways.extend (l_subway)
+				world.extend (l_subway.entrance_begin)
+				world.extend (l_subway.entrance_end)
+
+				l_cnt := l_cnt + 1
+			end
 		end
 
 	spawn_player (i_img_cat: EV_PIXMAP)
@@ -127,9 +159,10 @@ feature {NONE} -- Implementation
 			until
 				playing = False
 			loop
-				if l_cnt \\ 100000 = 0 then
+				if l_cnt \\ 10000 = 0 then
 					update
 					check_collisions
+					check_finished
 				end
 				l_cnt := l_cnt + 1
 			end
@@ -155,10 +188,15 @@ feature {NONE} -- Implementation
 			-- check for collisions
 		local
 			l_mouse: FOOP_MOUSE
+			l_subway: FOOP_SUBWAY
 			l_player_x: INTEGER
 			l_player_y: INTEGER
 			l_mouse_x: INTEGER
 			l_mouse_y: INTEGER
+			l_subway_begin_x: INTEGER
+			l_subway_begin_y: INTEGER
+			l_subway_end_x: INTEGER
+			l_subway_end_y: INTEGER
 		do
 			l_player_x := player.x
 			l_player_y := player.y
@@ -174,6 +212,49 @@ feature {NONE} -- Implementation
 				if (l_player_x - l_mouse_x) < 50 and (l_player_x - l_mouse_x) > -50 and
 					(l_player_y - l_mouse_y) < 10 and (l_player_y - l_mouse_y) > -10 then
 						-- TODO remove mouse
+				end
+
+				across
+					subways as s
+				loop
+					l_subway := s.item
+
+					l_subway_begin_x := l_subway.entrance_begin.x
+					l_subway_begin_y := l_subway.entrance_begin.y
+
+					l_subway_end_x := l_subway.entrance_end.x
+					l_subway_end_y := l_subway.entrance_end.y
+
+					if ((l_mouse_x - l_subway_begin_x) < 50 and (l_mouse_x - l_subway_begin_x) > -50 and
+							(l_mouse_y - l_subway_begin_y) < 50 and (l_mouse_y - l_subway_begin_y) > -50) or
+						((l_mouse_x - l_subway_end_x) < 50 and (l_mouse_x - l_subway_end_x) > -50 and
+							(l_mouse_y - l_subway_end_y) < 50 and (l_mouse_y - l_subway_end_y) > -50) then
+
+						l_mouse.enter_subway (l_subway)
+
+					end
+				end
+			end
+		end
+
+	check_finished
+			-- check if game is finished
+		local
+			l_mouse: FOOP_MOUSE
+			l_subway: FOOP_SUBWAY
+			l_mouse_x: INTEGER
+			l_mouse_y: INTEGER
+		do
+			across
+				mice as m
+			loop
+				l_mouse := m.item
+
+				l_mouse_x := l_mouse.x
+				l_mouse_y := l_mouse.y
+
+				if goal_x = l_mouse_x and goal_y = l_mouse_y then
+						-- TODO display game lost
 				end
 			end
 		end

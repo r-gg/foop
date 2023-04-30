@@ -141,6 +141,9 @@ feature {NONE} -- Implementation / Attributes
 
 	projector: EV_MODEL_DRAWING_AREA_PROJECTOR
 			-- projector
+
+	game: detachable FOOP_GAME
+			-- game
 feature {NONE} -- Implementation
 
 	build_main_container
@@ -176,7 +179,6 @@ feature {NONE} -- Implementation
 		end
 
 feature {NONE} -- Events
-
 	request_close_window
 			-- Process user request to close the window.
 		local
@@ -199,7 +201,6 @@ feature {NONE} -- Events
 	request_new_game
 			-- Process user request to create a new game.
 		local
-			l_game: FOOP_GAME
 			l_pixmap_cat: EV_PIXMAP
 			l_pixmap_mouse: EV_PIXMAP
 			l_pixmap_entrance: EV_PIXMAP
@@ -216,7 +217,7 @@ feature {NONE} -- Events
 			create l_pixmap_entrance
 			l_pixmap_entrance.set_with_named_file (file_system.pathname_to_string (img_entrance))
 
-			create l_game.make (world, projector, l_pixmap_cat, l_pixmap_mouse, l_pixmap_entrance)
+			create game.make (world, projector, l_pixmap_cat, l_pixmap_mouse, l_pixmap_entrance)
 		end
 
 	request_about

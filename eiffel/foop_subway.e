@@ -8,24 +8,21 @@ class
 	FOOP_SUBWAY
 
 create
-	make
+	make_with_pixmap
 
 feature {NONE} -- Initialization
 
-	make
-		-- create a subway with 2 entrances
-		local
-			l_entrance: FOOP_ENTRANCE
-			l_entrances: LINKED_LIST[FOOP_ENTRANCE]
+	make_with_pixmap(x_1, y_1, x_2, y_2: INTEGER pixmap: EV_PIXMAP)
+			-- create a subway with 2 entrances
 		do
-			create l_entrances.make
-			entrances := l_entrances
+			create entrance_begin.make_with_pixmap(x_1, y_1, pixmap)
+			create entrance_end.make_with_pixmap(x_2, y_2, pixmap)
 		end
 
-
-feature {NONE} -- Attributes
-
-	entrances: LIST [FOOP_ENTRANCE]
-			-- entrances of the subway
+feature -- Attributes
+	entrance_begin: FOOP_ENTRANCE
+			-- entrance of the subway
+	entrance_end: FOOP_ENTRANCE
+			-- entrance of the subway
 
 end
