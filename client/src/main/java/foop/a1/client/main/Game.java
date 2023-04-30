@@ -128,6 +128,10 @@ public class Game implements Runnable {
         websocketService.subscribe("/topic/games/" + gameId + "/enemies-positions-updated");
     }
 
+    public void subscribeToGameOver() {
+        websocketService.subscribe("/topic/games/" + gameId + "/over");
+    }
+
     public void setWebsocketService(WebsocketService websocketService) {
         Game.websocketService = websocketService;
         createGameSubscription = websocketService.subscribe("/topic/games/create");

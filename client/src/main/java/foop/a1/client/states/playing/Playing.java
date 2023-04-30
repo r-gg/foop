@@ -22,6 +22,7 @@ public class Playing extends State {
 
     public Playing() {
         Game.instance().subscribeToPositionUpdates(); // TODO: unsubscribe
+        Game.instance().subscribeToGameOver();
     }
 
     @Override

@@ -17,8 +17,14 @@ public class Game implements Runnable {
     private final List<Player> players = new ArrayList<>();
     private final List<Mouse> mice = new ArrayList<>();
     private GameBoard board;
-    private GameStatus status;
-    private Function<Void, Void> onMicePositionsUpdate = null;
+    private volatile GameStatus status;
+    private Function<Map<String, Position>, Void> onMicePositionsUpdate = null;
+    private Function<Team, Void> onGameOver = null;
+
+    public enum Team {
+        PLAYERS,
+        ENEMIES
+    }
 
     public Game() {
         gameId = UUID.randomUUID().toString();
@@ -72,9 +78,21 @@ public class Game implements Runnable {
             // just test movement to test communication
             mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 1, mice.get(0).getPosition().y()));
 
+            // test game over
+            if (mice.get(0).getPosition().x() > 70) {
+                if (this.onGameOver != null) {
+                    this.onGameOver.apply(Team.ENEMIES);
+                    this.status = GameStatus.ENDED;
+                }
+            }
+
             // send updated locations back
             if (this.onMicePositionsUpdate != null) {
-                this.onMicePositionsUpdate.apply(null);
+                this.onMicePositionsUpdate.apply(getMicePositions());
+            }
+
+            if (this.status == GameStatus.ENDED) {
+                break;
             }
 
             try {
@@ -82,12 +100,12 @@ public class Game implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            if(System.currentTimeMillis() - startMillis >= Constants.GAME_TIMEOUT_MILLIS){
-                break;
-            }
+//            if(System.currentTimeMillis() - startMillis >= Constants.GAME_TIMEOUT_MILLIS){
+//                break;
+//            }
         }
 
-        this.status = GameStatus.ENDED;
+//        this.status = GameStatus.ENDED;
         logger.info("Finished game {}", this.gameId);
     }
 
@@ -119,8 +137,12 @@ public class Game implements Runnable {
         return players.stream().map(Player::getPosition).collect(Collectors.toList());
     }
 
-    public void setOnMicePositionsUpdate(Function<Void, Void> onMicePositionsUpdate) {
+    public void setOnMicePositionsUpdate(Function<Map<String, Position>, Void> onMicePositionsUpdate) {
         this.onMicePositionsUpdate = onMicePositionsUpdate;
+    }
+
+    public void setOnGameOver(Function<Team, Void> onGameOver) {
+        this.onGameOver = onGameOver;
     }
 
     public Map<String, Position> getMicePositions() {

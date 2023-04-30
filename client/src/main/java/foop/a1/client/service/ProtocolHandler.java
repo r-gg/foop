@@ -12,6 +12,7 @@ import foop.a1.client.states.playing.entities.Player;
 import foop.a1.client.states.playing.entities.Position;
 import foop.a1.client.states.playing.entities.SubwayEntrance;
 import foop.a1.client.states.waiting.Waiting;
+import foop.a1.client.states.gameover.GameOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -44,6 +45,8 @@ public class ProtocolHandler {
             handleResponse((PositionUpdated) response);
         } else if (response instanceof EnemiesPositionsUpdated) {
             handleResponse((EnemiesPositionsUpdated) response);
+        } else if (response instanceof foop.a1.client.messages.response.GameOver) {
+            handleResponse((foop.a1.client.messages.response.GameOver)response);
         } else {
             throw new ProtocolException("Response from server does not have any of the provided types");
         }
@@ -133,5 +136,17 @@ public class ProtocolHandler {
             newEnemies.add(new Enemy(newPosId, new Position(newPositionsById.get(newPosId).getX(), newPositionsById.get(newPosId).getY())));
         }
         ((Playing) currentState).setEnemies(newEnemies);
+    }
+
+    private void handleResponse(foop.a1.client.messages.response.GameOver gameOver) {
+        State currentState = Game.instance().getState();
+        if (!(currentState instanceof Playing)) {
+            this.LOGGER.error("Enemies positions can be updated only in playing state");
+            return;
+        }
+
+        String winnerName = gameOver.getWinner() == foop.a1.client.messages.response.GameOver.Team.PLAYERS ? "Cats" : "Mice";
+        foop.a1.client.states.gameover.GameOver newState = new foop.a1.client.states.gameover.GameOver(winnerName);
+        Game.instance().nextState(newState);
     }
 }

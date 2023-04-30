@@ -6,6 +6,7 @@ import foop.a1.server.entities.GameBoard;
 import foop.a1.server.entities.Player;
 import foop.a1.server.entities.Position;
 import foop.a1.server.messages.response.EnemiesPositionsUpdated;
+import foop.a1.server.messages.response.GameOver;
 import foop.a1.server.messages.response.GameStarted;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,17 +36,15 @@ public class GameService {
         var game = new Game() {{
             setBoard(new GameBoard(200, 200));
         }};
-        game.setOnMicePositionsUpdate((Void) -> {
-            var msg = new EnemiesPositionsUpdated();
-            var positions = game.getMicePositions();
-            var mappedPositions = positions.entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, e -> new PositionDTO(e.getValue().x(), e.getValue().y())));
-            msg.setNewPositionsById(mappedPositions);
-
-            this.simpMessagingTemplate.convertAndSend("/topic/games/"+game.getGameId()+"/enemies-positions-updated", msg);
+        game.setOnMicePositionsUpdate((Map<String, Position> positions) -> {
+            this.broadcastMicePositions(game, positions);
             return null;
         });
+        game.setOnGameOver((Game.Team winner) -> {
+            this.gameOver(game, winner);
+            return null;
+        });
+
         games.add(game);
         return game.getGameId();
     }
@@ -96,6 +95,21 @@ public class GameService {
             return;
         }
         player.get().setPosition(newPosition);
+    }
+
+    public void broadcastMicePositions(Game game, Map<String, Position> positions) {
+        var msg = new EnemiesPositionsUpdated();
+        var mappedPositions = positions.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new PositionDTO(e.getValue().x(), e.getValue().y())));
+        msg.setNewPositionsById(mappedPositions);
+
+        this.simpMessagingTemplate.convertAndSend("/topic/games/"+game.getGameId()+"/enemies-positions-updated", msg);
+    }
+
+    public void gameOver(Game game, Game.Team winnerTeam) {
+        GameOver gameOver = new GameOver(winnerTeam == Game.Team.PLAYERS ? GameOver.Team.PLAYERS : GameOver.Team.ENEMIES);
+        simpMessagingTemplate.convertAndSend("/topic/games/"+game.getGameId()+"/over", gameOver);
     }
 
     private Pair<GameDTO, GameBoardDTO> gameToGameDTO(Game game){
