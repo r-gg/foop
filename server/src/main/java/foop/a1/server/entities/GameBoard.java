@@ -8,11 +8,13 @@ import java.util.List;
 public class GameBoard {
     private Pair<Integer, Integer> root;
     private Pair<Integer, Integer> dimensions;
+    private Subway goalSubway = new Subway(Arrays.asList(new Position(230, 270),new Position(100, 150)));
     private List<Subway> subways = Arrays.asList(
             new Subway(Arrays.asList(new Position(120, 120),new Position(20, 40))),
             new Subway(Arrays.asList(new Position(180, 180),new Position(300, 350))),
-            new Subway(Arrays.asList(new Position(230, 270),new Position(100, 150)))
+            goalSubway
     );
+
 
     public GameBoard(int width, int height) {
         root = Pair.of(0, 0);
@@ -47,5 +49,8 @@ public class GameBoard {
         if (subway != null) subways.add(subway);
     }
 
+    public Subway getGoalSubway() {
+        return goalSubway;
+    }
 }
 

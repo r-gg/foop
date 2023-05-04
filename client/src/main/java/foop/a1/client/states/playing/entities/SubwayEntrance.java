@@ -1,5 +1,7 @@
 package foop.a1.client.states.playing.entities;
 
+import foop.a1.client.util.Constants;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -23,7 +25,7 @@ public class SubwayEntrance extends Entity {
     }
 
     public void render(Graphics g) {
-        g.drawImage(backgroundImg, position.getX(), position.getY(), 40, 40, null);
+        g.drawImage(backgroundImg, position.getX() - (Constants.SUBWAY_IMAGE_WIDTH/2) , position.getY() - (Constants.SUBWAY_IMAGE_HEIGHT/2), Constants.SUBWAY_IMAGE_WIDTH, Constants.SUBWAY_IMAGE_HEIGHT, null);
     }
 }
 

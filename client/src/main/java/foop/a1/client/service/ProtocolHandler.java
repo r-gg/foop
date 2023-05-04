@@ -116,6 +116,7 @@ public class ProtocolHandler {
         var player = ((Playing) currentState).getPlayers().stream().filter(p -> positionUpdated.getPlayerId().equals(p.getId()))
                 .findAny()
                 .orElse(null);
+        LOGGER.info("current position: " +((Playing) currentState).getPlayer().getPosition().getX() + " " + ((Playing) currentState).getPlayer().getPosition().getY() );
         if (player != null) {
             player.setPosition(new Position(positionUpdated.getNewPosition().getX(), positionUpdated.getNewPosition().getY()));
         } else if (!positionUpdated.getPlayerId().equals(((Playing) currentState).getPlayer().getId())) {

@@ -1,5 +1,7 @@
 package foop.a1.client.states.playing.entities;
 
+import foop.a1.client.util.Constants;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,7 +19,9 @@ public class Enemy extends Entity {
     }
 
     public void render(Graphics g) {
-        g.drawImage(img, position.getX(), position.getY(), 50, 30, null);
+        g.drawImage(img, position.getX() - (Constants.ENEMY_IMAGE_WIDTH/2) , position.getY() - (Constants.ENEMY_IMAGE_HEIGHT/2), Constants.ENEMY_IMAGE_WIDTH, Constants.ENEMY_IMAGE_HEIGHT, null);
+        g.setColor(Color.BLUE);
+        g.drawRect(position.getX() - (Constants.ENEMY_IMAGE_WIDTH/2) , position.getY() - (Constants.ENEMY_IMAGE_HEIGHT/2), Constants.ENEMY_IMAGE_WIDTH, Constants.ENEMY_IMAGE_HEIGHT);
     }
 
     private BufferedImage loadImage() {

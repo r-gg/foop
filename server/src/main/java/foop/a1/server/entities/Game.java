@@ -76,10 +76,22 @@ public class Game implements Runnable {
         while (true) {
             // move mice
             // just test movement to test communication
-            mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 1, mice.get(0).getPosition().y()));
+            mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 10, mice.get(0).getPosition().y() + 10));
 
             // test game over
-            if (mice.get(0).getPosition().x() > 70) {
+            if (mice.get(0).getPosition().x() > 140) {
+                if (this.onGameOver != null) {
+                    this.onGameOver.apply(Team.ENEMIES);
+                    this.status = GameStatus.ENDED;
+                }
+            }
+            if (mice.isEmpty()) {
+                if (this.onGameOver != null) {
+                    this.onGameOver.apply(Team.PLAYERS);
+                    this.status = GameStatus.ENDED;
+                }
+            }
+            if (board.getGoalSubway().getMice().size() == mice.size()) {
                 if (this.onGameOver != null) {
                     this.onGameOver.apply(Team.ENEMIES);
                     this.status = GameStatus.ENDED;
@@ -88,6 +100,7 @@ public class Game implements Runnable {
 
             // send updated locations back
             if (this.onMicePositionsUpdate != null) {
+                this.moveMice();
                 this.onMicePositionsUpdate.apply(getMicePositions());
             }
 
@@ -108,6 +121,44 @@ public class Game implements Runnable {
 //        this.status = GameStatus.ENDED;
         logger.info("Finished game {}", this.gameId);
     }
+
+
+    /**
+     * Implements a naive movement strategy for the mice. Based on the current position of the mice, the players
+     * and the subways.
+     */
+    private void moveMice(){
+        for(var mouse : mice){
+            if(mouse.isAboveGround()){
+                // if mouse is above ground, move towards the goal subway
+                // if there is a player in the way, move towards the nearest subway exit
+                // if there is no player in the way, but there is another subway between the mouse and the goal subway,
+                // such that one of the remaining exits of that subway is closer to the goal subway,
+                // move into that subway
+                Position mousePos = mouse.getPosition();
+                Position closestGoalSubwayEntrancePos = Arrays.stream(board.getGoalSubway().getEntrances())
+                        .min(Comparator.comparingDouble(e -> e.euclideanDistance(mousePos)))
+                        .orElseThrow(() -> new RuntimeException("No goal subway entrance found"));
+                Position closestPlayerPos = players.stream()
+                        .map(Player::getPosition)
+                        .min(Comparator.comparingDouble(p -> p.euclideanDistance(mousePos)))
+                        .orElse(null);
+                if(closestPlayerPos != null){
+                    if(closestPlayerPos.euclideanDistance(mousePos) <= Constants.HITBOX_RADIUS ){
+                        mice.remove(mouse);
+                        logger.info("Mouse {} was caught by a player, {} mice remaining", mouse.getId(), mice.size());
+                        continue;
+                    }
+                }
+
+
+            } else {
+                // if mouse is in subway, move towards the subway exit closest to the goal subway
+
+            }
+        }
+    }
+
 
     public String getGameId() {
         return gameId;

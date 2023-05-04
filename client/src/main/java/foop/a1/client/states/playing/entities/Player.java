@@ -1,6 +1,8 @@
 package foop.a1.client.states.playing.entities;
 
-import java.awt.Graphics;
+import foop.a1.client.util.Constants;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,20 +25,23 @@ public class Player extends Entity {
     }
 
     public void render(Graphics g) {
-        g.drawImage(animation, position.getX(), position.getY(), 256, 160, null);
+        g.drawImage(animation, position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT-2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT, null);
+        g.setColor(Color.BLUE);
+        g.drawRect(0,0, 10,10);
+        g.drawRect(position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT-2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT);
     }
 
     private void updatePos() {
         Integer playerSpeed = 2;
-        if (left && !right) {
+        if (left && !right && position.getX() > 0) {
             position.setX(position.getX() - playerSpeed);
-        } else if (right && !left) {
+        } else if (right && !left && position.getX() < Constants.WINDOW_WIDTH) {
             position.setX(position.getX() + playerSpeed);
         }
 
-        if (up && !down) {
+        if (up && !down && position.getY() > 0) {
             position.setY(position.getY() - playerSpeed);
-        } else if (down && !up) {
+        } else if (down && !up && position.getY() < Constants.WINDOW_HEIGHT) {
             position.setY(position.getY() + playerSpeed);
         }
     }
