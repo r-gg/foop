@@ -8,5 +8,5 @@ public class Constants {
 
     public static final long GAME_TIMEOUT_MILLIS = 1000000000;
 
-    public static final double HITBOX_RADIUS = 50;
+    public static final double HITBOX_RADIUS = 100;
 }

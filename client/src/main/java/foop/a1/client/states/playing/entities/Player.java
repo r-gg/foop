@@ -10,13 +10,15 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class Player extends Entity {
-    private static BufferedImage animation;
+    private static BufferedImage playerImage;
+
+    private int imgWidth, imgHeight;
     private boolean left, up, right, down;
 
     public Player(String id, Position position) {
         super(id, position);
-        if (animation == null) {
-            animation = loadAnimation();
+        if (playerImage == null) {
+            playerImage = loadImage();
         }
     }
 
@@ -25,10 +27,10 @@ public class Player extends Entity {
     }
 
     public void render(Graphics g) {
-        g.drawImage(animation, position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT-2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT, null);
+        g.drawImage(playerImage, position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT/2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT, null);
         g.setColor(Color.BLUE);
         g.drawRect(0,0, 10,10);
-        g.drawRect(position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT-2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT);
+        g.drawRect(position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT/2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT);
     }
 
     private void updatePos() {
@@ -46,11 +48,12 @@ public class Player extends Entity {
         }
     }
 
-    private BufferedImage loadAnimation() {
-        try (InputStream is = getClass().getResourceAsStream("/static/cat.png")) {
+    private BufferedImage loadImage() {
+        try (InputStream is = getClass().getResourceAsStream("/static/cat-solo.png")) {
             BufferedImage img = ImageIO.read(is);
-
-            return img.getSubimage(50, 50, 50, 50);
+            imgWidth = img.getWidth();
+            imgHeight = img.getHeight();
+            return img;
 
         } catch (IOException e) {
             e.printStackTrace();

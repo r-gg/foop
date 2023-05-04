@@ -133,10 +133,14 @@ public class ProtocolHandler {
 
         var newPositionsById = positionsUpdated.getNewPositionsById();
         List<Enemy> newEnemies = new ArrayList<>();
+        int nEnemiesBefore = ((Playing) currentState).getEnemies().size();
         for (var newPosId : newPositionsById.keySet()) {
             newEnemies.add(new Enemy(newPosId, new Position(newPositionsById.get(newPosId).getX(), newPositionsById.get(newPosId).getY())));
         }
         ((Playing) currentState).setEnemies(newEnemies);
+        if (newEnemies.size() < nEnemiesBefore) {
+            this.LOGGER.info("Enemy caught, now there are {} enemies", newEnemies.size());
+        }
     }
 
     private void handleResponse(foop.a1.client.messages.response.GameOver gameOver) {
@@ -145,6 +149,7 @@ public class ProtocolHandler {
             this.LOGGER.error("Enemies positions can be updated only in playing state");
             return;
         }
+        LOGGER.info("Game over, winner: " + gameOver.getWinner());
 
         String winnerName = gameOver.getWinner() == foop.a1.client.messages.response.GameOver.Team.PLAYERS ? "Cats" : "Mice";
         foop.a1.client.states.gameover.GameOver newState = new foop.a1.client.states.gameover.GameOver(winnerName);

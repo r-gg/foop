@@ -74,6 +74,12 @@ public class Game implements Runnable {
     public void run() {
         long startMillis = System.currentTimeMillis();
         while (true) {
+            if (mice.isEmpty()) {
+                if (this.onGameOver != null) {
+                    this.onGameOver.apply(Team.PLAYERS);
+                    this.status = GameStatus.ENDED;
+                }
+            }
             // move mice
             // just test movement to test communication
             mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 10, mice.get(0).getPosition().y() + 10));
@@ -82,12 +88,6 @@ public class Game implements Runnable {
             if (mice.get(0).getPosition().x() > 140) {
                 if (this.onGameOver != null) {
                     this.onGameOver.apply(Team.ENEMIES);
-                    this.status = GameStatus.ENDED;
-                }
-            }
-            if (mice.isEmpty()) {
-                if (this.onGameOver != null) {
-                    this.onGameOver.apply(Team.PLAYERS);
                     this.status = GameStatus.ENDED;
                 }
             }
@@ -128,6 +128,8 @@ public class Game implements Runnable {
      * and the subways.
      */
     private void moveMice(){
+        List<Mouse> toRemove = new ArrayList<>();
+
         for(var mouse : mice){
             if(mouse.isAboveGround()){
                 // if mouse is above ground, move towards the goal subway
@@ -145,7 +147,7 @@ public class Game implements Runnable {
                         .orElse(null);
                 if(closestPlayerPos != null){
                     if(closestPlayerPos.euclideanDistance(mousePos) <= Constants.HITBOX_RADIUS ){
-                        mice.remove(mouse);
+                        toRemove.add(mouse);
                         logger.info("Mouse {} was caught by a player, {} mice remaining", mouse.getId(), mice.size());
                         continue;
                     }
@@ -157,6 +159,7 @@ public class Game implements Runnable {
 
             }
         }
+        mice.removeAll(toRemove);
     }
 
 
@@ -198,6 +201,9 @@ public class Game implements Runnable {
 
     public Map<String, Position> getMicePositions() {
         var result = new HashMap<String, Position>();
+        if(mice.size() < 4){
+            logger.info("Mice size < 4");
+        }
         for (var mouse : mice) {
             // return only above ground to avoid cheating on client side
             if (mouse.isAboveGround()) {
