@@ -11,6 +11,8 @@ import java.io.InputStream;
 public class SubwayEntrance extends Entity {
     private BufferedImage backgroundImg;
 
+    private boolean belongsToGoalSubway = false;
+
     public SubwayEntrance(Position position) {
         super(position);
         loadImage();
@@ -24,8 +26,20 @@ public class SubwayEntrance extends Entity {
         }
     }
 
+    public boolean isBelongsToGoalSubway() {
+        return belongsToGoalSubway;
+    }
+
+    public void setBelongsToGoalSubway(boolean belongsToGoalSubway) {
+        this.belongsToGoalSubway = belongsToGoalSubway;
+    }
+
     public void render(Graphics g) {
         g.drawImage(backgroundImg, position.getX() - (Constants.SUBWAY_IMAGE_WIDTH/2) , position.getY() - (Constants.SUBWAY_IMAGE_HEIGHT/2), Constants.SUBWAY_IMAGE_WIDTH, Constants.SUBWAY_IMAGE_HEIGHT, null);
+        if (belongsToGoalSubway) {
+            g.setColor(Color.GREEN);
+            g.drawRect(position.getX() - (Constants.SUBWAY_IMAGE_WIDTH/2) , position.getY() - (Constants.SUBWAY_IMAGE_HEIGHT/2), Constants.SUBWAY_IMAGE_WIDTH, Constants.SUBWAY_IMAGE_HEIGHT);
+        }
     }
 }
 

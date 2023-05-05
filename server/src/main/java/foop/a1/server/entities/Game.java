@@ -2,8 +2,10 @@ package foop.a1.server.entities;
 
 import foop.a1.server.util.Constants;
 import foop.a1.server.util.GameStatus;
+import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
@@ -79,19 +81,21 @@ public class Game implements Runnable {
                     this.onGameOver.apply(Team.PLAYERS);
                     this.status = GameStatus.ENDED;
                 }
+                break;
             }
             // move mice
             // just test movement to test communication
-            mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 10, mice.get(0).getPosition().y() + 10));
+            //mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 1, mice.get(0).getPosition().y() + 10));
 
-            // test game over
-            if (mice.get(0).getPosition().x() > 140) {
-                if (this.onGameOver != null) {
-                    this.onGameOver.apply(Team.ENEMIES);
-                    this.status = GameStatus.ENDED;
-                }
-            }
-            if (board.getGoalSubway().getMice().size() == mice.size()) {
+//            // test game over
+//            if (mice.get(0).getPosition().x() > 140) {
+//                if (this.onGameOver != null) {
+//                    this.onGameOver.apply(Team.ENEMIES);
+//                    this.status = GameStatus.ENDED;
+//                }
+//            }
+            // if all alive mice are in goal subway, game over
+            if (board.getGoalSubway().getMice().size() == mice.size() && mice.size() > 0) {
                 if (this.onGameOver != null) {
                     this.onGameOver.apply(Team.ENEMIES);
                     this.status = GameStatus.ENDED;
@@ -145,21 +149,119 @@ public class Game implements Runnable {
                         .map(Player::getPosition)
                         .min(Comparator.comparingDouble(p -> p.euclideanDistance(mousePos)))
                         .orElse(null);
+                Subway closestSubway = board.getSubways().stream()
+                        .map(s -> Pair.of(s, s.getEntrances()))
+                        .map( pair -> Pair.of(pair.getFirst(), Arrays.stream(pair.getSecond())
+                                .min(Comparator.comparingDouble(e -> e.euclideanDistance(mousePos)))
+                                .orElseThrow(() -> new RuntimeException("No subway entrance found"))))
+                        // here each pair (subway , position of its closest entrance)
+                        .min(Comparator.comparingDouble(pair -> pair.getSecond().euclideanDistance(mousePos)))
+                        .orElseThrow(() -> new RuntimeException("No subway found"))
+                        .getFirst();
+                Position closestSubwayEntrance = Arrays.stream(closestSubway.getEntrances())
+                        .min(Comparator.comparingDouble(e -> e.euclideanDistance(mousePos)))
+                        .orElseThrow(() -> new RuntimeException("No subway entrance found"));
                 if(closestPlayerPos != null){
                     if(closestPlayerPos.euclideanDistance(mousePos) <= Constants.HITBOX_RADIUS ){
                         toRemove.add(mouse);
                         logger.info("Mouse {} was caught by a player, {} mice remaining", mouse.getId(), mice.size());
                         continue;
                     }
+                    if(closestPlayerPos.euclideanDistance(mousePos) <= Constants.MOUSE_ALERT_RANGE){
+                        // move away from the player
+                        Position newPos = mousePos.moveAwayFrom(closestPlayerPos, Constants.MOUSE_SPEED);
+                        mouse.setPosition(newPos);
+                        checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
+                        continue;
+
+                    }
+                    // if closest player is between this mouse and the goal subway,
+                    // move away from the player or towards the closest subway exit in the opposite direction
+                    // of the closest player
+                    if (mousePos.isBetweenWithinPerimeter(closestPlayerPos, closestGoalSubwayEntrancePos, Constants.BETWEEN_PERIMETER)){
+                        // move away from player
+                        Position newPos = mousePos.moveAwayFrom(closestPlayerPos, Constants.MOUSE_SPEED);
+                        mouse.setPosition(newPos);
+                        checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
+                        continue;
+                    }
+                    // if closest subway entrance is between this mouse and the goal subway,
+                    // move towards the closest subway entrance
+                    if (mousePos.isBetweenWithinPerimeter(closestSubwayEntrance, closestGoalSubwayEntrancePos, Constants.BETWEEN_PERIMETER)){
+                        // move towards subway entrance
+                        Position newPos = mousePos.moveTowards(closestSubwayEntrance, Constants.MOUSE_SPEED);
+                        mouse.setPosition(newPos);
+                        checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
+                        continue;
+                    }
+
+                    // if everything is clear between the mouse and goal subway, move towards the goal subway
+                    Position newPos = mousePos.moveTowards(closestGoalSubwayEntrancePos, Constants.MOUSE_SPEED);
+                    mouse.setPosition(newPos);
+                    checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
+
+                }else {
+                    throw new RuntimeException("No player found");
                 }
 
 
             } else {
-                // if mouse is in subway, move towards the subway exit closest to the goal subway
+                if(mouse.getCurrentSubway().equals(board.getGoalSubway())){
+                    // if mouse is in the goal subway, don't do anything
+                    continue;
+                }
+                // check the remaining delay
+                if(mouse.getRemainingDelay() == 0){
+                    // build pairs of subways and their entrances with the distance to each goal subway entrance
+                    Position selectedExit = Arrays.stream(mouse.getCurrentSubway().getEntrances())
+                            .flatMap(exit -> Arrays.stream(board.getGoalSubway().getEntrances()).map(goalEntrance -> Pair.of(exit, goalEntrance)))
+                            .min(Comparator.comparingDouble(pair -> pair.getFirst().euclideanDistance(pair.getSecond())))
+                            .orElseThrow(() -> new RuntimeException("No subway exit found")).getFirst();
+                    mouse.exitSubway();
 
+                    // generate a random position offset from the selected exit
+                    // that is at least twice as large as the subway entrance radius
+                    // and at most four times as large as the subway entrance radius
+                    Random random = new Random();
+                    int randomX = random.nextInt(2*Constants.SUBWAY_ENTRANCE_RADIUS, 3*Constants.SUBWAY_ENTRANCE_RADIUS+1);
+                    int randomY = random.nextInt(2*Constants.SUBWAY_ENTRANCE_RADIUS, 3*Constants.SUBWAY_ENTRANCE_RADIUS+1);
+                    int randomSignX = random.nextBoolean() ? 1 : -1;
+                    int randomSignY = random.nextBoolean() ? 1 : -1;
+                    Position randomPos = new Position(randomSignX* randomX, randomSignY* randomY);
+
+
+                    Position newPos = selectedExit.add(randomPos); // add offset to the selected exit
+                    mouse.setPosition(newPos);
+                }else if (mouse.getRemainingDelay() > 0){
+                    mouse.decreaseRemainingDelay();
+                }else {
+                    throw new RuntimeException("Mouse remaining delay is negative even when under ground");
+                }
             }
         }
         mice.removeAll(toRemove);
+    }
+
+    /**
+     * Checks if there is a subway below the mouse's new position and enters it if so.
+     * @param mouse
+     */
+    private void checkIfAboveSubwayEntranceAndEnterIfSo(Mouse mouse){
+        // finding first subway that has one of the entrances below the mouse's new position
+        Position mousePos = mouse.getPosition();
+        Optional<Subway> subwayBelow = board.getSubways().stream()
+                .filter(s -> Arrays.stream(s.getEntrances())
+                        .anyMatch(e -> e.euclideanDistance(mousePos) <= Constants.SUBWAY_ENTRANCE_RADIUS))
+                .findFirst();
+        // if such subway exists, then enter it:
+        if(subwayBelow.isPresent()){
+            Subway subway = subwayBelow.get();
+            mouse.enterSubway(subway);
+            List<Position> catLocations = players.stream()
+                    .map(Player::getPosition)
+                    .collect(Collectors.toList());
+            subway.addMouse(mouse, catLocations);
+        }
     }
 
 

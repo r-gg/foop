@@ -8,10 +8,10 @@ import java.util.List;
 public class GameBoard {
     private Pair<Integer, Integer> root;
     private Pair<Integer, Integer> dimensions;
-    private Subway goalSubway = new Subway(Arrays.asList(new Position(230, 270),new Position(100, 150)));
+    private Subway goalSubway = new Subway(Arrays.asList(new Position(100, 100),new Position(100, 200)));
     private List<Subway> subways = Arrays.asList(
-            new Subway(Arrays.asList(new Position(120, 120),new Position(20, 40))),
-            new Subway(Arrays.asList(new Position(180, 180),new Position(300, 350))),
+            new Subway(Arrays.asList(new Position(200, 100),new Position(200, 200))),
+            new Subway(Arrays.asList(new Position(300, 100),new Position(300, 200))),
             goalSubway
     );
 
@@ -19,6 +19,7 @@ public class GameBoard {
     public GameBoard(int width, int height) {
         root = Pair.of(0, 0);
         dimensions = Pair.of(width, height);
+        goalSubway.setGoalSubway(true);
     }
 
     public Pair<Integer, Integer> getRoot() {

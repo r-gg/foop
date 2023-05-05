@@ -1,5 +1,7 @@
 package foop.a1.server.entities;
 
+import foop.a1.server.util.Constants;
+
 public record Position(int x, int y) {
 
     public double euclideanDistance(Position other) {
@@ -31,6 +33,38 @@ public record Position(int x, int y) {
         return new Position((int) px, (int) py);
     }
 
+    /**
+     * Returns a position that is steps away from this position in the direction opposite of the other position
+     * @param steps
+     * @return
+     */
+    public Position moveAwayFrom(Position other, int steps) {
+        double slope = (double) (this.y - other.y) / (this.x - other.x);
+        int signX = (other.x - this.x) > 0 ? -1 : 1;
+        signX = (other.x - this.x) == 0 ? 0 : signX;
+        int newX = this.x + signX * steps;
+        int signY = (other.y - this.y) > 0 ? -1 : 1;
+        signY = (other.y - this.y) == 0 ? 0 : signY;
+        int newY = (int) (slope * signY * steps + this.y);
+        return new Position(newX, newY);
+    }
+
+    /**
+     * Returns a position that is "steps" away from this position in the direction of the other position
+     * @param other
+     * @param steps
+     * @return
+     */
+    public Position moveTowards(Position other, int steps){
+        double slope = (double) (this.y - other.y) / (this.x - other.x);
+        int signX = (other.x - this.x) > 0 ? 1 : -1;
+        signX = (other.x - this.x) == 0 ? 0 : signX;
+        int newX = this.x + signX * steps;
+        int signY = (other.y - this.y) > 0 ? 1 : -1;
+        signY = (other.y - this.y) == 0 ? 0 : signY;
+        int newY = (int) (slope * signY * steps + this.y);
+        return new Position(newX, newY);
+    }
 
     public boolean isBetweenWithinPerimeter(Position maybeBetween, Position other, int perimeter) {
         // check if maybeBetween is in the rectangle defined by this and other
@@ -47,4 +81,10 @@ public record Position(int x, int y) {
         double distance = projection.euclideanDistance(maybeBetween);
         return distance <= perimeter;
     }
+
+    public Position add(Position other) {
+        return new Position(this.x + other.x, this.y + other.y);
+    }
+
+
 }

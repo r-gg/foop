@@ -99,7 +99,10 @@ public class ProtocolHandler {
         List<SubwayEntrance> entrances = new ArrayList<>();
         for (var subway : gameStarted.getGameBoardDTO().getSubways()) {
             for (var en : subway.getEntrances()) {
-                entrances.add(new SubwayEntrance(new Position(en.getX(), en.getY())));
+                SubwayEntrance entrance = new SubwayEntrance(new Position(en.getX(), en.getY()));
+                if (subway.isGoalSubway()) entrance.setBelongsToGoalSubway(true);
+                entrances.add(entrance);
+
             }
         }
         playing.setSubwayEntrances(entrances);

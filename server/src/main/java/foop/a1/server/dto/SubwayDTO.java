@@ -6,12 +6,22 @@ public class SubwayDTO {
     private List<PositionDTO> entrances;
     private List<MouseDTO> mice;
 
+    private boolean isGoalSubway =false;
+
     public SubwayDTO() {
     }
 
     public SubwayDTO(List<PositionDTO> entrances, List<MouseDTO> mice) {
         this.entrances = entrances;
         this.mice = mice;
+    }
+
+    public boolean isGoalSubway() {
+        return isGoalSubway;
+    }
+
+    public void setGoalSubway(boolean goalSubway) {
+        isGoalSubway = goalSubway;
     }
 
     public List<PositionDTO> getEntrances() {

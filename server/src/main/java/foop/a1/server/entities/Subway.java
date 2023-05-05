@@ -26,13 +26,14 @@ public class Subway {
         return mice;
     }
 
-    public void addMouse(Mouse mouse) {
+    public void addMouse(Mouse mouse, List<Position> catLocations) {
         mice.add(mouse);
+        informMice(catLocations);
     }
 
-    public void informMice(Game game) {
+    public void informMice(List<Position> catLocations){
         for (Mouse mouse : mice) {
-            mouse.inform(game);
+            mouse.inform(catLocations);
         }
     }
 
