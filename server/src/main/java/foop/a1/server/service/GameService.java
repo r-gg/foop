@@ -5,6 +5,7 @@ import foop.a1.server.entities.*;
 import foop.a1.server.messages.response.EnemiesPositionsUpdated;
 import foop.a1.server.messages.response.GameOver;
 import foop.a1.server.messages.response.GameStarted;
+import foop.a1.server.util.Constants;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
@@ -101,6 +102,10 @@ public class GameService {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> new PositionDTO(e.getValue().x(), e.getValue().y())));
         msg.setNewPositionsById(mappedPositions);
 
+        Map<String, Integer> scores = new HashMap<>();
+        scores.put(Constants.SCOREBOARD_MICE_EATEN_STR , game.getMiceEaten());
+        scores.put(Constants.SCOREBOARD_MICE_ESCAPED_STR , game.getMiceEscaped());
+        msg.setScores(scores);
         this.simpMessagingTemplate.convertAndSend("/topic/games/"+game.getGameId()+"/enemies-positions-updated", msg);
     }
 

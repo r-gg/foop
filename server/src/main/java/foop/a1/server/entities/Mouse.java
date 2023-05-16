@@ -78,6 +78,8 @@ public class Mouse {
     public void exitSubway() {
         this.isAboveGround = true;
         this.resetDelay();
+        this.currentSubway.removeMouse(this);
+        this.lastSeenCatPositions = null;
         this.currentSubway = null;
     }
 
@@ -95,4 +97,11 @@ public class Mouse {
         this.lastSeenCatPositions = catPositions;
     }
 
+    public List<Position> getLastSeenCatPositions() {
+        return lastSeenCatPositions;
+    }
+
+    public void setLastSeenCatPositions(List<Position> lastSeenCatPositions) {
+        this.lastSeenCatPositions = lastSeenCatPositions;
+    }
 }

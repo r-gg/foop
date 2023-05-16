@@ -22,4 +22,7 @@ public class Constants {
     public static final int WINDOW_WIDTH = 832;
     public static final int WINDOW_HEIGHT = 448;
 
+    public static final String SCOREBOARD_MICE_EATEN_STR = "miceEaten";
+    public static final String SCOREBOARD_MICE_ESCAPED_STR = "miceEscaped";
+
 }

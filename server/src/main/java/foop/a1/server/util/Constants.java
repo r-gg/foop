@@ -22,4 +22,9 @@ public class Constants {
     public static final int GAMEBOARD_HEIGHT = 448;
 
     public static final int N_MICE = 4;
+
+    public static final String SCOREBOARD_MICE_EATEN_STR = "miceEaten";
+    public static final String SCOREBOARD_MICE_ESCAPED_STR = "miceEscaped";
+
+    public static final double SUBWAY_EXITING_ALERT_RANGE = 1.5 * SUBWAY_ENTRANCE_RADIUS;
 }

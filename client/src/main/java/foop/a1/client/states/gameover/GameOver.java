@@ -1,5 +1,6 @@
 package foop.a1.client.states.gameover;
 
+import foop.a1.client.main.Game;
 import foop.a1.client.states.State;
 import foop.a1.client.util.Constants;
 

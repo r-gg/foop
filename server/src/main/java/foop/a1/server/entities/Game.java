@@ -23,6 +23,9 @@ public class Game implements Runnable {
     private Function<Map<String, Position>, Void> onMicePositionsUpdate = null;
     private Function<Team, Void> onGameOver = null;
 
+    private int miceEaten = 0;
+    private int miceEscaped = 0;
+
     public enum Team {
         PLAYERS,
         ENEMIES
@@ -157,6 +160,7 @@ public class Game implements Runnable {
                 if(closestPlayerPos != null){
                     if(closestPlayerPos.euclideanDistance(mousePos) <= Constants.HITBOX_RADIUS ){
                         toRemove.add(mouse);
+                        miceEaten++;
                         logger.info("Mouse {} was caught by a player, {} mice remaining", mouse.getId(), mice.size());
                         continue;
                     }
@@ -205,12 +209,25 @@ public class Game implements Runnable {
                 }
                 // check the remaining delay
                 if(mouse.getRemainingDelay() == 0){
+                    // first filter out entrances that have a cat that is very close to them (based on the
+                    // "last seen cats" information, which is stored for each mouse in a subway)
+
+                    // NOTE: mice might get stuck in a subway if there are two entrances and cat is too close to both of them
+                    // Then they will never exit unless another mouse INFORMS them that there are no cats around the exits.
+
                     // build pairs of subways and their entrances with the distance to each goal subway entrance
-                    Position selectedExit = Arrays.stream(mouse.getCurrentSubway().getEntrances())
+                    Pair<Position, Position> selectedExitPair = Arrays.stream(mouse.getCurrentSubway().getEntrances())
+                            .filter(entrance -> mouse.getLastSeenCatPositions().stream().allMatch(catPos ->
+                                    catPos.euclideanDistance(entrance) > Constants.SUBWAY_EXITING_ALERT_RANGE ))
                             .flatMap(exit -> Arrays.stream(board.getGoalSubway().getEntrances()).map(goalEntrance -> Pair.of(exit, goalEntrance)))
                             .min(Comparator.comparingDouble(pair -> pair.getFirst().euclideanDistance(pair.getSecond())))
-                            .orElseThrow(() -> new RuntimeException("No subway exit found")).getFirst();
+                            .orElse(null);
+                            //.getFirst();
+
+                    if (selectedExitPair == null) continue;
+                    Position selectedExit = selectedExitPair.getFirst();
                     mouse.exitSubway();
+
 
                     // generate a random angle and move the mouse towards a position on a circle around the selected exit
                     // defined by the random angle
@@ -249,6 +266,10 @@ public class Game implements Runnable {
         if(subwayBelow.isPresent()){
             Subway subway = subwayBelow.get();
             mouse.enterSubway(subway);
+            if (subwayBelow.get().isGoalSubway()) {
+                miceEscaped++;
+                logger.info("Mouse {} reached the goal subway, {} mice remaining", mouse.getId(), mice.size());
+            }
             List<Position> catLocations = players.stream()
                     .map(Player::getPosition)
                     .collect(Collectors.toList());
@@ -305,5 +326,21 @@ public class Game implements Runnable {
             }
         }
         return result;
+    }
+
+    public int getMiceEaten() {
+        return miceEaten;
+    }
+
+    public void setMiceEaten(int miceEaten) {
+        this.miceEaten = miceEaten;
+    }
+
+    public int getMiceEscaped() {
+        return miceEscaped;
+    }
+
+    public void setMiceEscaped(int miceEscaped) {
+        this.miceEscaped = miceEscaped;
     }
 }

@@ -2,6 +2,7 @@ package foop.a1.client.service;
 
 
 import foop.a1.client.dto.GameDTO;
+import foop.a1.client.dto.PositionDTO;
 import foop.a1.client.main.Game;
 import foop.a1.client.messages.response.*;
 import foop.a1.client.states.State;
@@ -22,6 +23,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.ProtocolException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ProtocolHandler {
@@ -134,13 +136,15 @@ public class ProtocolHandler {
             return;
         }
 
-        var newPositionsById = positionsUpdated.getNewPositionsById();
+        Map<String, PositionDTO> newPositionsById = positionsUpdated.getNewPositionsById();
+        Map<String, Integer> newScores = positionsUpdated.getScores();
         List<Enemy> newEnemies = new ArrayList<>();
         int nEnemiesBefore = ((Playing) currentState).getEnemies().size();
         for (var newPosId : newPositionsById.keySet()) {
             newEnemies.add(new Enemy(newPosId, new Position(newPositionsById.get(newPosId).getX(), newPositionsById.get(newPosId).getY())));
         }
         ((Playing) currentState).setEnemies(newEnemies);
+        ((Playing) currentState).setScores(newScores);
         if (newEnemies.size() < nEnemiesBefore) {
             this.LOGGER.info("Enemy caught, now there are {} enemies", newEnemies.size());
         }
