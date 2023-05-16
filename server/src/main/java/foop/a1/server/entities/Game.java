@@ -31,24 +31,17 @@ public class Game implements Runnable {
     public Game() {
         gameId = UUID.randomUUID().toString();
         status = GameStatus.WAITING;
+        Random random = new Random();
 
+        for (int i = 0; i < Constants.N_MICE; i++) {
+            var mouse = new Mouse();
+            mouse.setId(UUID.randomUUID().toString());
+            int x = random.nextInt(Constants.GAMEBOARD_WIDTH);
+            int y = random.nextInt(Constants.GAMEBOARD_HEIGHT);
+            mouse.setPosition(new Position(x, y));
+            this.mice.add(mouse);
+        }
         // test mice
-        var mouse1 = new Mouse();
-        mouse1.setId(UUID.randomUUID().toString());
-        mouse1.setPosition(new Position(50, 300));
-        this.mice.add(mouse1);
-        var mouse2 = new Mouse();
-        mouse2.setId(UUID.randomUUID().toString());
-        mouse2.setPosition(new Position(10, 100));
-        this.mice.add(mouse2);
-        var mouse3 = new Mouse();
-        mouse3.setId(UUID.randomUUID().toString());
-        mouse3.setPosition(new Position(20, 250));
-        this.mice.add(mouse3);
-        var mouse4 = new Mouse();
-        mouse4.setId(UUID.randomUUID().toString());
-        mouse4.setPosition(new Position(170, 220));
-        this.mice.add(mouse4);
     }
 
     public void addPlayer(Player player) {
@@ -187,13 +180,13 @@ public class Game implements Runnable {
                     }
                     // if closest subway entrance is between this mouse and the goal subway,
                     // move towards the closest subway entrance
-                    if (mousePos.isBetweenWithinPerimeter(closestSubwayEntrance, closestGoalSubwayEntrancePos, Constants.BETWEEN_PERIMETER)){
-                        // move towards subway entrance
-                        Position newPos = mousePos.moveTowards(closestSubwayEntrance, Constants.MOUSE_SPEED);
-                        mouse.setPosition(newPos);
-                        checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
-                        continue;
-                    }
+//                    if (mousePos.isBetweenWithinPerimeter(closestSubwayEntrance, closestGoalSubwayEntrancePos, Constants.BETWEEN_PERIMETER)){
+//                        // move towards subway entrance
+//                        Position newPos = mousePos.moveTowards(closestSubwayEntrance, Constants.MOUSE_SPEED);
+//                        mouse.setPosition(newPos);
+//                        checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
+//                        continue;
+//                    }
 
                     // if everything is clear between the mouse and goal subway, move towards the goal subway
                     Position newPos = mousePos.moveTowards(closestGoalSubwayEntrancePos, Constants.MOUSE_SPEED);
@@ -219,15 +212,14 @@ public class Game implements Runnable {
                             .orElseThrow(() -> new RuntimeException("No subway exit found")).getFirst();
                     mouse.exitSubway();
 
-                    // generate a random position offset from the selected exit
-                    // that is at least twice as large as the subway entrance radius
-                    // and at most four times as large as the subway entrance radius
+                    // generate a random angle and move the mouse towards a position on a circle around the selected exit
+                    // defined by the random angle
+                    // The mouse moves exactly three steps from the exit "boundary"
                     Random random = new Random();
-                    int randomX = random.nextInt(2*Constants.SUBWAY_ENTRANCE_RADIUS, 3*Constants.SUBWAY_ENTRANCE_RADIUS+1);
-                    int randomY = random.nextInt(2*Constants.SUBWAY_ENTRANCE_RADIUS, 3*Constants.SUBWAY_ENTRANCE_RADIUS+1);
-                    int randomSignX = random.nextBoolean() ? 1 : -1;
-                    int randomSignY = random.nextBoolean() ? 1 : -1;
-                    Position randomPos = new Position(randomSignX* randomX, randomSignY* randomY);
+                    double randAngle = random.nextDouble()*2*Math.PI;
+                    double randomX = Math.cos(randAngle) * ( Constants.SUBWAY_ENTRANCE_RADIUS + 3*Constants.MOUSE_SPEED ) ;
+                    double randomY = Math.sin(randAngle)* (Constants.SUBWAY_ENTRANCE_RADIUS + 3*Constants.MOUSE_SPEED);
+                    Position randomPos = new Position((int) randomX, (int) randomY);
 
 
                     Position newPos = selectedExit.add(randomPos); // add offset to the selected exit

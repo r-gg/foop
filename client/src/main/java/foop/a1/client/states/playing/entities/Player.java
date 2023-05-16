@@ -29,8 +29,13 @@ public class Player extends Entity {
     public void render(Graphics g) {
         g.drawImage(playerImage, position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT/2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT, null);
         g.setColor(Color.BLUE);
-        g.drawRect(0,0, 10,10);
-        g.drawRect(position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT/2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT);
+        g.drawOval(position.getX()- (Constants.HITBOX_RADIUS/2), position.getY()- (Constants.HITBOX_RADIUS/2),
+                Constants.HITBOX_RADIUS,Constants.HITBOX_RADIUS);
+        g.setColor(Color.RED);
+        g.drawOval(position.getX()- (Constants.MOUSE_ALERT_RANGE/2), position.getY()- (Constants.MOUSE_ALERT_RANGE/2),
+                Constants.MOUSE_ALERT_RANGE,Constants.MOUSE_ALERT_RANGE);
+        // g.drawRect();
+        //g.drawRect(position.getX()- (Constants.PLAYER_IMAGE_WIDTH/2), position.getY()- (Constants.PLAYER_IMAGE_HEIGHT/2), Constants.PLAYER_IMAGE_WIDTH, Constants.PLAYER_IMAGE_HEIGHT);
     }
 
     private void updatePos() {

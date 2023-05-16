@@ -14,10 +14,12 @@ public class Constants {
 
     public static final int MOUSE_SPEED = 10;
 
-    public static final double MOUSE_ALERT_RANGE = 400;
+    public static final double MOUSE_ALERT_RANGE = 100;
 
     public static final int SUBWAY_ENTRANCE_RADIUS = 50;
 
     public static final int GAMEBOARD_WIDTH = 832;
     public static final int GAMEBOARD_HEIGHT = 448;
+
+    public static final int N_MICE = 4;
 }

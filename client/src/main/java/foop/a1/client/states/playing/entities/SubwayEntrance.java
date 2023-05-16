@@ -40,6 +40,9 @@ public class SubwayEntrance extends Entity {
             g.setColor(Color.GREEN);
             g.drawRect(position.getX() - (Constants.SUBWAY_IMAGE_WIDTH/2) , position.getY() - (Constants.SUBWAY_IMAGE_HEIGHT/2), Constants.SUBWAY_IMAGE_WIDTH, Constants.SUBWAY_IMAGE_HEIGHT);
         }
+        g.setColor(Color.MAGENTA);
+        g.drawOval(position.getX() - (Constants.SUBWAY_ENTRANCE_RADIUS/2), position.getY() - (Constants.SUBWAY_ENTRANCE_RADIUS/2),
+                Constants.SUBWAY_ENTRANCE_RADIUS,Constants.SUBWAY_ENTRANCE_RADIUS);
     }
 }
 

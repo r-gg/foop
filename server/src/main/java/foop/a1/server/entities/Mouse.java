@@ -41,12 +41,13 @@ public class Mouse {
     }
 
     public void setPosition(Position position) {
-
+        int xNorm = Math.max(Math.min(position.x(), Constants.GAMEBOARD_WIDTH) , 0);
+        int yNorm = Math.max(Math.min(position.y(), Constants.GAMEBOARD_HEIGHT) , 0);
         this.position = new Position(
-                Math.max(Math.min(position.x(), Constants.GAMEBOARD_WIDTH) , 0),
-                Math.max(Math.min(position.y(), Constants.GAMEBOARD_HEIGHT) , 0)
+                xNorm,
+                yNorm
         );
-        if(this.position.y()==0){
+        if(xNorm != position.x() || yNorm != position.y()){
             System.out.println("what happened");
         }
     }

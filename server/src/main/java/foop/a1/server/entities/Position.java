@@ -39,13 +39,11 @@ public record Position(int x, int y) {
      * @return
      */
     public Position moveAwayFrom(Position other, int steps) {
-        double slope = (double) (this.y - other.y) / (this.x - other.x);
-        int signX = (other.x - this.x) > 0 ? -1 : 1;
-        signX = (other.x - this.x) == 0 ? 0 : signX;
-        int newX = this.x + signX * steps;
-        int signY = (other.y - this.y) > 0 ? -1 : 1;
-        signY = (other.y - this.y) == 0 ? 0 : signY;
-        int newY = (int) (slope * signY * steps + this.y);
+        double ratio = (double) steps / this.euclideanDistance(other);
+        int dx = other.x - this.x;
+        int dy = other.y - this.y;
+        int newX = this.x - (int) (dx * ratio);
+        int newY = this.y - (int) (dy * ratio);
         return new Position(newX, newY);
     }
 
@@ -56,13 +54,11 @@ public record Position(int x, int y) {
      * @return
      */
     public Position moveTowards(Position other, int steps){
-        double slope = (double) (this.y - other.y) / (this.x - other.x);
-        int signX = (other.x - this.x) > 0 ? 1 : -1;
-        signX = (other.x - this.x) == 0 ? 0 : signX;
-        int newX = this.x + signX * steps;
-        int signY = (other.y - this.y) > 0 ? 1 : -1;
-        signY = (other.y - this.y) == 0 ? 0 : signY;
-        int newY = (int) (slope * signY * steps + this.y);
+        double ratio = (double) steps / this.euclideanDistance(other);
+        int dx = other.x - this.x;
+        int dy = other.y - this.y;
+        int newX = this.x + (int) (dx * ratio);
+        int newY = this.y + (int) (dy * ratio);
         return new Position(newX, newY);
     }
 
@@ -74,6 +70,11 @@ public record Position(int x, int y) {
         if (maybeBetween.y < Math.min(this.y, other.y) || maybeBetween.y > Math.max(this.y, other.y)) {
             return false;
         }
+        // if it is the as this or other then false
+        if (maybeBetween.equals(this) || maybeBetween.equals(other)) {
+            return false;
+        }
+
         // find projection of maybeBetween on the line defined by this and other
         // if the distance between the projection and maybeBetween is less than the perimeter, then maybeBetween is between this and other
 
@@ -86,5 +87,12 @@ public record Position(int x, int y) {
         return new Position(this.x + other.x, this.y + other.y);
     }
 
-
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Position)) {
+            return false;
+        }
+        Position other = (Position) obj;
+        return this.x == other.x && this.y == other.y;
+    }
 }
