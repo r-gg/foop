@@ -33,6 +33,7 @@ feature {NONE} -- Initialization
 
 			goal_x := 0
 			goal_y := 0
+			active := TRUE
 
 			Precursor {EV_MODEL_MOVE_HANDLE}
 		end
@@ -65,9 +66,6 @@ feature {NONE} -- Attributes
 	goal_y: INTEGER
 			-- y coordinate of goal
 
-	subway: detachable FOOP_SUBWAY
-			-- subway if currently in
-
 	last_subway: detachable FOOP_SUBWAY
 			-- last subway
 
@@ -76,7 +74,14 @@ feature {NONE} -- Attributes
 
 	time_spent_in_subway: detachable INTEGER
 			-- time already spent in subway
+
 feature -- Implementation
+	subway: detachable FOOP_SUBWAY
+			-- subway if currently in
+
+	active: BOOLEAN
+	        -- whether mouse is active
+
 	move_random
 			-- move mouse by one position
 		local
@@ -172,4 +177,8 @@ feature -- Implementation
 			end
 		end
 
+	deactivate ()
+		do
+			active := FALSE
+		end
 end
