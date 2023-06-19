@@ -1,3 +1,4 @@
+
 note
 	description: "Summary description for {FOOP_GAME}."
 	author: ""
@@ -27,6 +28,8 @@ feature {NONE} -- Initialization
 			random.start
 
 			spawn_subways (i_img_entrance)
+			goal_subway := subways.at (random.item \\ 4)
+
 			spawn_player (i_img_cat)
 			spawn_mice (i_img_mouse)
 
@@ -101,8 +104,6 @@ feature {NONE} -- Implementation
 
 				l_cnt := l_cnt + 1
 			end
-
-			goal_subway := subways.at (random.item \\ 4)
 		end
 
 	spawn_player (i_img_cat: EV_PIXMAP)
@@ -185,7 +186,7 @@ feature {NONE} -- Implementation
 			across
 				mice as m
 			loop
-				if m.item.active = TRUE and m.item.subway /= goal_subway then
+				if m.item.is_active() = True and m.item.subway /= goal_subway then
 					random.forth
 					if (random.item \\ 2) = 0 then
 						m.item.move_random
@@ -223,20 +224,8 @@ feature {NONE} -- Implementation
 
 				if (l_player_x - l_mouse_x) < 50 and (l_player_x - l_mouse_x) > -50 and
 					(l_player_y - l_mouse_y) < 10 and (l_player_y - l_mouse_y) > -10 then
-						l_mouse.deactivate
 
-					from
-						world.start
-					until
-						world.exhausted
-					loop
-						if world.item = l_mouse then
-							world.item.hide
-							world.forth
-						else
-							world.forth
-						end
-					end
+					l_mouse.deactivate
 
 				else
 					across
@@ -250,12 +239,16 @@ feature {NONE} -- Implementation
 						l_subway_end_x := l_subway.entrance_end.x
 						l_subway_end_y := l_subway.entrance_end.y
 
-						if ((l_mouse_x - l_subway_begin_x) < 50 and (l_mouse_x - l_subway_begin_x) > -50 and
-								(l_mouse_y - l_subway_begin_y) < 50 and (l_mouse_y - l_subway_begin_y) > -50) or
-							((l_mouse_x - l_subway_end_x) < 50 and (l_mouse_x - l_subway_end_x) > -50 and
-								(l_mouse_y - l_subway_end_y) < 50 and (l_mouse_y - l_subway_end_y) > -50) then
+						if ((l_mouse_x - l_subway_begin_x) < 100 and (l_mouse_x - l_subway_begin_x) > -100 and
+								(l_mouse_y - l_subway_begin_y) < 100 and (l_mouse_y - l_subway_begin_y) > -100) or
+							((l_mouse_x - l_subway_end_x) < 100 and (l_mouse_x - l_subway_end_x) > -100 and
+								(l_mouse_y - l_subway_end_y) < 100 and (l_mouse_y - l_subway_end_y) > -100) then
 
-							l_mouse.enter_subway (l_subway)
+							if l_subway = goal_subway then
+								l_mouse.set_finished (True)
+							else
+								l_mouse.enter_subway (l_subway)
+							end
 
 						end
 					end
@@ -274,43 +267,33 @@ feature {NONE} -- Implementation
 			l_game_end_text: EV_MODEL_TEXT
 			l_all_mice_in_goal_subway: BOOLEAN
 			l_all_mice_caught: BOOLEAN
+			l_any_mice_in_game: BOOLEAN
 		do
 			l_all_mice_caught := True
+			l_all_mice_in_goal_subway := True
 
 			across
 				mice as m
 			loop
 				l_mouse := m.item
 
-				if l_mouse.active = TRUE then
+				if l_mouse.is_active() = True then
 					l_all_mice_caught := False
+				end
+
+				if l_mouse.is_finished() /= True then
+					l_all_mice_in_goal_subway := False
 				end
 			end
 
-			if l_all_mice_caught then
+			if l_all_mice_caught = True then
 				create l_game_end_text.make_with_text ("Game Won")
 				l_game_end_text.set_point_position (500, 500)
 				world.extend (l_game_end_text)
-					-- playing := False
-			else
-				l_all_mice_in_goal_subway := True
-
-				across
-					mice as m
-				loop
-					l_mouse := m.item
-
-					if l_mouse.subway /= goal_subway then
-						l_all_mice_in_goal_subway := False
-					end
-				end
-
-				if l_all_mice_in_goal_subway then
-					create l_game_end_text.make_with_text ("Game Lost")
-					l_game_end_text.set_point_position (500, 500)
-					world.extend (l_game_end_text)
-						-- playing := False
-				end
+			elseif l_all_mice_in_goal_subway = True then
+				create l_game_end_text.make_with_text ("Game Lost")
+				l_game_end_text.set_point_position (500, 500)
+				world.extend (l_game_end_text)
 			end
 		end
 

@@ -33,7 +33,7 @@ feature {NONE} -- Initialization
 
 			goal_x := 0
 			goal_y := 0
-			active := TRUE
+			active := True
 
 			Precursor {EV_MODEL_MOVE_HANDLE}
 		end
@@ -48,6 +48,8 @@ feature {NONE} -- Initialization
 
 			goal_x := i_goal_x
 			goal_y := i_goal_y
+			finished := False
+			active := True
 
 			create l_hex.make_with_pixmap (i_pixmap)
 			extend (l_hex)
@@ -66,6 +68,12 @@ feature {NONE} -- Attributes
 	goal_y: INTEGER
 			-- y coordinate of goal
 
+	active: BOOLEAN
+			-- whether mouse is active
+
+	finished: BOOLEAN
+			-- true if in goal subway
+
 	last_subway: detachable FOOP_SUBWAY
 			-- last subway
 
@@ -74,13 +82,9 @@ feature {NONE} -- Attributes
 
 	time_spent_in_subway: detachable INTEGER
 			-- time already spent in subway
-
 feature -- Implementation
 	subway: detachable FOOP_SUBWAY
 			-- subway if currently in
-
-	active: BOOLEAN
-	        -- whether mouse is active
 
 	move_random
 			-- move mouse by one position
@@ -97,18 +101,18 @@ feature -- Implementation
 						l_x := s.entrance_begin.x
 						l_y := s.entrance_begin.y
 
-						set_x (l_x)
-						set_y (l_y)
+						set_x_y (l_x, l_Y)
 					else
 						l_x := s.entrance_end.x
 						l_y := s.entrance_end.y
 
-						set_x (l_x)
-						set_y (l_y)
+						set_x_y (l_x, l_y)
 					end
 
 					last_subway := subway
 					subway := Void
+
+					show()
 				else
 					time_spent_in_subway := time_spent_in_subway + 1
 				end
@@ -119,17 +123,17 @@ feature -- Implementation
 				if (l_random_number \\ 3) /= 0 then
 					if x /= goal_x then
 						if x < goal_x then
-							set_x (x + 1)
+							set_x_y (x + 1, y)
 						else
-							set_x (x - 1)
+							set_x_y (x - 1, y)
 						end
 					end
 
 					if y /= goal_y then
 						if y < goal_y then
-							set_y (y + 1)
+							set_x_y (x, y + 1)
 						else
-							set_y (y - 1)
+							set_x_y (x, y - 1)
 						end
 					end
 				else
@@ -137,11 +141,11 @@ feature -- Implementation
 					l_random_number := random.item
 					if (l_random_number \\ 2) = 0 then
 						if x < (window_width - 200) then
-							set_x (x + 1)
+							set_x_y (x + 1, y)
 						end
 					else
 						if x > 0 then
-							set_x (x - 1)
+							set_x_y (x - 1, y)
 						end
 					end
 
@@ -149,11 +153,11 @@ feature -- Implementation
 					l_random_number := random.item
 					if (l_random_number \\ 2) = 0 then
 						if y < (window_height - 200) then
-							set_y (y + 1)
+							set_x_y (x, y + 1)
 						end
 					else
 						if y > 0 then
-							set_y (y - 1)
+							set_x_y (x, y - 1)
 						end
 					end
 				end
@@ -174,11 +178,31 @@ feature -- Implementation
 
 				time_in_subway := l_random_number \\ 10
 				time_spent_in_subway := 0
+
+				hide()
 			end
 		end
 
-	deactivate ()
+	is_finished(): BOOLEAN
 		do
-			active := FALSE
+			Result := finished
 		end
+
+	set_finished (i_finished: BOOLEAN)
+		do
+			finished := i_finished
+			hide()
+		end
+
+	is_active(): BOOLEAN
+		do
+			Result := active
+		end
+
+	deactivate()
+		do
+			active := False
+			hide()
+		end
+
 end
