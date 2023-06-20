@@ -162,21 +162,35 @@ feature {NONE} -- Implementation
 	run
 			-- game loop
 		local
-			l_cnt: INTEGER
+			l_delta: DOUBLE
+			l_time_per_frame: DOUBLE
+			l_current_time: TIME
+			l_current_nano: REAL_64
+			l_previous_time: TIME
+			l_previous_nano: REAL_64
 		do
-			l_cnt := 0
+			create l_previous_time.make_now
+			l_time_per_frame := 1000000000.0 / 60;
 
 			from
 				playing := True
 			until
 				playing = False
 			loop
-				if l_cnt \\ 100000 = 0 then
+				create l_current_time.make_now
+
+				l_current_nano := l_current_time.fine_second * 1000000000
+				l_previous_nano := l_previous_time.fine_second * 1000000000
+
+				l_delta := l_delta + (l_current_nano - l_previous_nano) / l_time_per_frame;
+				l_previous_time := l_current_time
+
+				if l_delta >= 1 then
 					update
 					check_collisions
 					check_finished
+					l_delta := 0
 				end
-				l_cnt := l_cnt + 1
 			end
 		end
 
@@ -271,6 +285,7 @@ feature {NONE} -- Implementation
 		do
 			l_all_mice_caught := True
 			l_all_mice_in_goal_subway := True
+			l_any_mice_in_game := False
 
 			across
 				mice as m
@@ -279,10 +294,12 @@ feature {NONE} -- Implementation
 
 				if l_mouse.is_active() = True then
 					l_all_mice_caught := False
+					l_any_mice_in_game := True
 				end
 
 				if l_mouse.is_finished() /= True then
 					l_all_mice_in_goal_subway := False
+					l_any_mice_in_game := True
 				end
 			end
 
@@ -292,6 +309,10 @@ feature {NONE} -- Implementation
 				world.extend (l_game_end_text)
 			elseif l_all_mice_in_goal_subway = True then
 				create l_game_end_text.make_with_text ("Game Lost")
+				l_game_end_text.set_point_position (500, 500)
+				world.extend (l_game_end_text)
+			elseif l_any_mice_in_game = False then
+				create l_game_end_text.make_with_text ("Game Tie")
 				l_game_end_text.set_point_position (500, 500)
 				world.extend (l_game_end_text)
 			end
