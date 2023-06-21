@@ -170,7 +170,7 @@ feature {NONE} -- Implementation
 			l_previous_nano: REAL_64
 		do
 			create l_previous_time.make_now
-			l_time_per_frame := 1000000000.0 / 60;
+			l_time_per_frame := 1000000000.0 / 144;
 
 			from
 				playing := True

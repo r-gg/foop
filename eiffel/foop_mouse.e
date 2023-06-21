@@ -94,7 +94,7 @@ feature -- Implementation
 			l_y: INTEGER
 		do
 			if attached subway as s then
-				if time_spent_in_subway = time_in_subway then
+				if time_spent_in_subway <= time_in_subway then
 					random.forth
 					l_random_number := random.item
 					if (l_random_number \\ 2) = 0 then
