@@ -20,8 +20,8 @@ public class Enemy extends Entity {
 
     public void render(Graphics g) {
         g.drawImage(img, position.getX() - (Constants.ENEMY_IMAGE_WIDTH/2) , position.getY() - (Constants.ENEMY_IMAGE_HEIGHT/2), Constants.ENEMY_IMAGE_WIDTH, Constants.ENEMY_IMAGE_HEIGHT, null);
-        g.setColor(Color.BLUE);
-        g.drawRect(position.getX() - (4/2) , position.getY() - (4/2), 4, 4);
+//        g.setColor(Color.BLUE);
+//        g.drawRect(position.getX() - (4/2) , position.getY() - (4/2), 4, 4);
     }
 
     private BufferedImage loadImage() {

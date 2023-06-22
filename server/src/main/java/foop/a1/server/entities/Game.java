@@ -79,17 +79,7 @@ public class Game implements Runnable {
                 }
                 break;
             }
-            // move mice
-            // just test movement to test communication
-            //mice.get(0).setPosition(new Position(mice.get(0).getPosition().x() + 1, mice.get(0).getPosition().y() + 10));
 
-//            // test game over
-//            if (mice.get(0).getPosition().x() > 140) {
-//                if (this.onGameOver != null) {
-//                    this.onGameOver.apply(Team.ENEMIES);
-//                    this.status = GameStatus.ENDED;
-//                }
-//            }
             // if all alive mice are in goal subway, game over
             if (board.getGoalSubway().getMice().size() == mice.size() && mice.size() > 0) {
                 if (this.onGameOver != null) {
@@ -113,12 +103,8 @@ public class Game implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-//            if(System.currentTimeMillis() - startMillis >= Constants.GAME_TIMEOUT_MILLIS){
-//                break;
-//            }
         }
 
-//        this.status = GameStatus.ENDED;
         logger.info("Finished game {}", this.gameId);
     }
 
@@ -182,15 +168,6 @@ public class Game implements Runnable {
                         checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
                         continue;
                     }
-                    // if closest subway entrance is between this mouse and the goal subway,
-                    // move towards the closest subway entrance
-//                    if (mousePos.isBetweenWithinPerimeter(closestSubwayEntrance, closestGoalSubwayEntrancePos, Constants.BETWEEN_PERIMETER)){
-//                        // move towards subway entrance
-//                        Position newPos = mousePos.moveTowards(closestSubwayEntrance, Constants.MOUSE_SPEED);
-//                        mouse.setPosition(newPos);
-//                        checkIfAboveSubwayEntranceAndEnterIfSo(mouse);
-//                        continue;
-//                    }
 
                     // if everything is clear between the mouse and goal subway, move towards the goal subway
                     Position newPos = mousePos.moveTowards(closestGoalSubwayEntrancePos, Constants.MOUSE_SPEED);

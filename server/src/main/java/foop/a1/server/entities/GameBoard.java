@@ -8,10 +8,20 @@ import java.util.List;
 public class GameBoard {
     private Pair<Integer, Integer> root;
     private Pair<Integer, Integer> dimensions;
-    private Subway goalSubway = new Subway(Arrays.asList(new Position(100, 100),new Position(100, 200)));
+    private Subway goalSubway = new Subway(
+            Arrays.asList(
+                    new Position(120, 80),
+                    new Position(60, 220))
+    );
     private List<Subway> subways = Arrays.asList(
-            new Subway(Arrays.asList(new Position(200, 100),new Position(200, 200))),
-            new Subway(Arrays.asList(new Position(300, 100),new Position(300, 200))),
+            new Subway(Arrays.asList(
+                    new Position(510, 120),
+                    new Position(380, 220)
+            )),
+            new Subway(Arrays.asList(
+                    new Position(20, 300),
+                    new Position(600, 360)
+            )),
             goalSubway
     );
 
