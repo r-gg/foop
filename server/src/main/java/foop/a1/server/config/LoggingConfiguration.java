@@ -9,8 +9,6 @@ import java.lang.invoke.MethodHandles;
 
 @Configuration
 public class LoggingConfiguration {
-
-    // todo: maybe return logger to each class, because now each time something is logged with it, it says that it comes from logging configuration
     @Bean
     public Logger logger() {
         return LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

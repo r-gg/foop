@@ -98,7 +98,6 @@ public class WebSocketController {
         var gameOpt = gameService.getGame(startGame.getGameId());
         if (gameOpt.isEmpty()) {
             logger.info("Game {}: Game not found", startGame.getGameId());
-//            messagingTemplate.convertAndSendToUser(registerForGame.getUsername(),"/queue/"+gameId+"/register", new RegistrationResult(){{setSuccessful(false);}});
             return;
         }
 
@@ -118,28 +117,8 @@ public class WebSocketController {
 
         Position newPos = new Position(updatePosition.getNewPosition().getX(), updatePosition.getNewPosition().getY());
         gameService.updatePlayerPosition(gameOpt.get(), userId, newPos);
-        // TODO: check for success?
         var positionUpdated = new PositionUpdated(updatePosition.getGameId(), userId, updatePosition.getNewPosition());
         messagingTemplate.convertAndSend("/topic/games/" + updatePosition.getGameId() + "/position-updated", positionUpdated);
         logger.info("Game {} : Updated position", updatePosition.getGameId());
     }
-
-//    public void gameStatusUpdate(Game game) throws ExecutionException, InterruptedException, TimeoutException {
-//        var client = new StandardWebSocketClient();
-//        var stompClient = new WebSocketStompClient(client);
-//        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-//
-//        var futureSession = stompClient.connectAsync(URL, new StompSessionHandlerAdapter() {
-//            @Override
-//            public Type getPayloadType(StompHeaders headers) {
-//                return StatusUpdate.class;
-//            }
-//        });
-//
-//        var gameDTOGameBoardDTOPair = gameToGameDTO(game);
-//        var statusUpdate = new StatusUpdate(gameDTOGameBoardDTOPair.getFirst(), gameDTOGameBoardDTOPair.getSecond());
-//
-//        var session = futureSession.get(1, TimeUnit.SECONDS);
-//        session.send(String.format("/%s/status", game.getGameId()), statusUpdate);
-//    }
 }

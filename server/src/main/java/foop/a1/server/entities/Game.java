@@ -43,7 +43,6 @@ public class Game implements Runnable {
             mouse.setPosition(new Position(x, y));
             this.mice.add(mouse);
         }
-        // test mice
     }
 
     public void addPlayer(Player player) {
