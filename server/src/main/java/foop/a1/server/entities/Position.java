@@ -1,6 +1,5 @@
 package foop.a1.server.entities;
 
-import foop.a1.server.util.Constants;
 
 public record Position(int x, int y) {
 

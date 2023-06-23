@@ -1,6 +1,5 @@
 package foop.a1.client.service;
 
-
 import foop.a1.client.dto.GameDTO;
 import foop.a1.client.dto.PositionDTO;
 import foop.a1.client.main.Game;
@@ -13,7 +12,6 @@ import foop.a1.client.states.playing.entities.Player;
 import foop.a1.client.states.playing.entities.Position;
 import foop.a1.client.states.playing.entities.SubwayEntrance;
 import foop.a1.client.states.waiting.Waiting;
-import foop.a1.client.states.gameover.GameOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -28,7 +26,7 @@ import java.util.Map;
 @Component
 public class ProtocolHandler {
 
-    private Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 
     // Precondition response is an instance of Message
@@ -39,8 +37,6 @@ public class ProtocolHandler {
             handleResponse((StatusUpdate) response);
         } else if (response instanceof RegistrationResult) {
             handleResponse((RegistrationResult) response);
-//        } else if (response instanceof AllGames) {
-//            handleResponse((AllGames) response);
         } else if (response instanceof GameStarted) {
             handleResponse((GameStarted) response);
         } else if (response instanceof PositionUpdated) {
@@ -82,10 +78,6 @@ public class ProtocolHandler {
             LOGGER.error("Registration failed");
         }
     }
-
-//    private void handleResponse(AllGames allGames){
-//        // Not supported currently because we only implement one game.
-//    }
 
     private void handleResponse(GameStarted gameStarted){
         Playing playing = new Playing();

@@ -2,7 +2,6 @@ package foop.a1.server.entities;
 
 import foop.a1.server.util.Constants;
 import foop.a1.server.util.GameStatus;
-import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -70,7 +69,6 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
-        long startMillis = System.currentTimeMillis();
         while (true) {
             if (mice.isEmpty()) {
                 if (this.onGameOver != null) {
@@ -131,18 +129,6 @@ public class Game implements Runnable {
                         .map(Player::getPosition)
                         .min(Comparator.comparingDouble(p -> p.euclideanDistance(mousePos)))
                         .orElse(null);
-                Subway closestSubway = board.getSubways().stream()
-                        .map(s -> Pair.of(s, s.getEntrances()))
-                        .map( pair -> Pair.of(pair.getFirst(), Arrays.stream(pair.getSecond())
-                                .min(Comparator.comparingDouble(e -> e.euclideanDistance(mousePos)))
-                                .orElseThrow(() -> new RuntimeException("No subway entrance found"))))
-                        // here each pair (subway , position of its closest entrance)
-                        .min(Comparator.comparingDouble(pair -> pair.getSecond().euclideanDistance(mousePos)))
-                        .orElseThrow(() -> new RuntimeException("No subway found"))
-                        .getFirst();
-                Position closestSubwayEntrance = Arrays.stream(closestSubway.getEntrances())
-                        .min(Comparator.comparingDouble(e -> e.euclideanDistance(mousePos)))
-                        .orElseThrow(() -> new RuntimeException("No subway entrance found"));
                 if(closestPlayerPos != null){
                     if(closestPlayerPos.euclideanDistance(mousePos) <= Constants.HITBOX_RADIUS ){
                         toRemove.add(mouse);
@@ -199,7 +185,6 @@ public class Game implements Runnable {
                             .flatMap(exit -> Arrays.stream(board.getGoalSubway().getEntrances()).map(goalEntrance -> Pair.of(exit, goalEntrance)))
                             .min(Comparator.comparingDouble(pair -> pair.getFirst().euclideanDistance(pair.getSecond())))
                             .orElse(null);
-                            //.getFirst();
 
                     if (selectedExitPair == null) continue;
                     Position selectedExit = selectedExitPair.getFirst();

@@ -14,9 +14,7 @@ import java.io.InputStream;
 public class Waiting extends State {
     private BufferedImage backgroundImg;
     private BufferedImage waitingImg;
-
-    //TODO temporary button to be able to start the game manually(for gui development)
-    private Rectangle startButton = new Rectangle(10, 10, 100, 50);
+    private final Rectangle startButton = new Rectangle(10, 10, 100, 50);
 
     public Waiting() {
         loadImages();

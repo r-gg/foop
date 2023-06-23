@@ -135,7 +135,6 @@ public class Game implements Runnable {
     public void setWebsocketService(WebsocketService websocketService) {
         Game.websocketService = websocketService;
         createGameSubscription = websocketService.subscribe("/topic/games/create");
-//        websocketService.subscribe("/topic/games");
     }
 
     public static WebsocketService service() {

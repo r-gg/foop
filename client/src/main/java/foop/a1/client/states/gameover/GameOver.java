@@ -1,13 +1,12 @@
 package foop.a1.client.states.gameover;
 
-import foop.a1.client.main.Game;
 import foop.a1.client.states.State;
 import foop.a1.client.util.Constants;
 
 import java.awt.*;
 
 public class GameOver extends State {
-    private String winnerTeamName;
+    private final String winnerTeamName;
 
     public GameOver(String winnerTeamName) {
         this.winnerTeamName = winnerTeamName;
