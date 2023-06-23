@@ -69,3 +69,5 @@ replay_pid*
 *.iml
 out
 gen
+
+eiffel/EIFGENs
